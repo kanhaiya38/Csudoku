@@ -57,22 +57,23 @@ bool checkcol(int **arr, int len, int col, int num) {
  */
 
 bool checkblock(int **arr, int len, int row, int col, int num) {
+    
     int left, right, top, bottom;
     int size = (int)sqrt(len);
 
     /* to find the boundaries of the block.
     */
 
-    left = col / size;
-    right = col / size + 1;
-    top = row / size;
-    bottom = row / size + 1;
-
+    left = (col / size) * size;
+    right = left + size;
+    top = (row / size) * size;
+    bottom = top + size;
+    
     /* to find if the num is in the block.
     */
 
-    for(int i = left; i < right; i++) {
-        for(int j = top; j < bottom; j++) {
+    for(int i = top; i < bottom; i++) {
+        for(int j = left; j < right; j++) {
             if(arr[i][j] == num) {
                 return true;
             }
