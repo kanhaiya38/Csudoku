@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 #include "check.h"
 #include "stack.h"
 
@@ -25,7 +26,46 @@ bool issafe(int** arr, int len, int row, int col, int num) {
     return true;
 }
 
-int main(){
+bool checkblock(int **arr, int len, int row, int col, int num) {
+    int left, right, top, bottom;
+    int size = (int)sqrt(len);
+
+    /* to find the boundaries of the block.
+    */
+
+    left = (col / size) * size;
+    right = left + size;
+    top = (row / size) * size;
+    bottom = top + size;
+    
+    /* to find if the num is in the block.
+    */
+
+    for(int i = top; i < bottom; i++) {
+        for(int j = left; j < right; j++) {
+            if(arr[i][j] == num) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool findsafenum(int **arr, int len, int row, int col, int *i) {
+    for(int j = *i + 1; j <= len; j++) {
+        printf("iterations %d\n", j);
+        if(issafe(arr, len, row, col, j)) {
+            *i = j;
+            return true;
+        }
+    }
+    printf("now its false\n");
+    return false;
+}
+
+int main(int argc, char* argv[]) {
+
     int** sudoku;
 
     /* first allocating memory to store address of integer pointer
@@ -47,6 +87,7 @@ int main(){
     
     sudoku[0][0] = 1;
     sudoku[0][2] = 3;
+    sudoku[1][0] = 4;
     sudoku[1][2] = 2;
     sudoku[1][3] = 1;
     sudoku[2][1] = 1;
@@ -56,22 +97,27 @@ int main(){
 
     // {
     //     1, 0, 3, 0
-    //     0, 0, 2, 1
+    //     4, 0, 2, 1
     //     0, 1, 0, 2
     //     2, 4, 0, 0
     // }
+    int i = 0;
 
-    if(issafe(sudoku, SIZE, 0, 3, 4)) {
-        printf("Okay\n");
-    }
-    // stack s;
-    // init(&s);
-    // values temp;
-    // temp.row = 1;
-    // temp.col = 7;
-    // temp.num = 3;
-    // push(&s, temp);
-    // pop(&s);
+    // for(int a = 0; a < SIZE; a++) {
+    //     for(int b = 0; b < SIZE; b++) {
+    //         checkblock(sudoku, SIZE, a, b, 1);
+    //     }
+    // }
+
+    if(checkblock(sudoku, SIZE, 0, 3, 4))
+        printf("true\n");
+    else 
+        printf("false\n");
+
+    // if(findsafenum(sudoku, SIZE, 0, 3, &i))
+    //     printf("%d is safe num\n");
     
-    // return 0;
+    free(sudoku);
+
+    return 0;
 }

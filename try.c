@@ -66,14 +66,14 @@ bool findemptycell(int **arr, int len, int *row, int *col) {
  */
 
 bool findsafenum(int **arr, int len, int row, int col, int *i) {
-    for(int j = 0 + 1; j <= len; j++) {
+    for(int j = *i + 1; j <= len; j++) {
+        // printf("iterations %d\n", j);
         if(issafe(arr, len, row, col, j)) {
-    printf("hey here %d %d\n", row, col);
             *i = j;
             return true;
         }
     }
-    printf("now its false\n");
+    // printf("now its false\n");
     return false;
 }
 
@@ -83,65 +83,24 @@ bool findsafenum(int **arr, int len, int row, int col, int *i) {
  */
 
 bool sudokusolver(int **arr, int len) {
-
-    // int row, col;
-
-    // if (!findemptycell(arr, len, &row, &col))
-    //     return true;
-
-    // for (int num = 1; num <= 4; num++) {
-    //     if (issafe(arr, len, row, col, num)) {
-    //         arr[row][col] = num;
-
-    //         if (sudokusolver(arr, len))
-    //             return true;
-    //         arr[row][col] = UNASSIGNED;
-    //     }
-    // }
-    // return false;
-
     int row, col;
-    int i;
-    values temp;
-    stack s;
-    static int count = 0;
-
-    if(count == 0) {
-        init(&s);
-    }
-
-    if(findemptycell(arr, len, &row, &col)) {
-        printf("(%d, %d) is an empty cell\n", row, col);
-        i = 0;
-
-        if(findsafenum(arr, len, row, col, &i)) {
-
-            printf("%d is a safe number\n", i);
-            arr[row][col] = i;
-            temp.row = row;
-            temp.col = col;
-            temp.num = i;
-            if(!isfull(&s)) {
-                push(&s, temp);
-            } else {
-                return false;
-            }
-            count++;
-            sudokusolver(arr, len);
-        } else {
-            printf("ïm in else\n");
-            if(!isempty(&s)) {
-                temp = pop(&s);
-            } else {
-                return false;
-            }
-            arr[temp.row][temp.col] = UNASSIGNED;
-            i = temp.num;
-            count++;
-            sudokusolver(arr, len);
-        }
+    int i = 0;
     
+    if(!findemptycell(arr, len, &row, &col)) {
+        return true;
     }
+
+    printf("(%d, %d) is an empty cell\n", row, col);
+    
+    if(!findsafenum(arr, len, row, col, &i)) {
+        return false;
+    }
+
+    printf("%d is safe num\n", i);
+
+    arr[row][col] = i;
+    sudokusolver(arr, len);
+
     return true;
 }
 
@@ -191,6 +150,7 @@ int main(int argc, char* argv[]) {
     //     0, 1, 0, 2
     //     2, 4, 0, 0
     // }
+        printsudoku(sudoku, SIZE);
 
     if(sudokusolver(sudoku, SIZE)) {
         printsudoku(sudoku, SIZE);
