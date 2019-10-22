@@ -150,7 +150,8 @@ int main(int argc, char* argv[]) {
     //     0, 1, 0, 2
     //     2, 4, 0, 0
     // }
-        printsudoku(sudoku, SIZE);
+    
+    printsudoku(sudoku, SIZE);
 
     if(sudokusolver(sudoku, SIZE)) {
         printsudoku(sudoku, SIZE);
