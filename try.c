@@ -82,24 +82,53 @@ bool findsafenum(int **arr, int len, int row, int col, int *i) {
  * else returns false means sudoku can't be solved
  */
 
-bool sudokusolver(int **arr, int len) {
+bool sudokusolver(int **arr, int len, stack s) {
     int row, col;
-    int i = 0;
-    
+    static int i = 0;
+    values temp;
+
+    /* to get index row, col of empty cell 
+     */
     if(!findemptycell(arr, len, &row, &col)) {
         return true;
     }
 
     printf("(%d, %d) is an empty cell\n", row, col);
-    
+
+    /* to find safe number at location row, col
+    */
     if(!findsafenum(arr, len, row, col, &i)) {
-        return false;
+        /* if there is no safe number at that position,
+        * it backtracks.
+        * but if the stack becomes empty it returns false
+        * means the sudoku cannot be solved
+        */
+        if(!isempty(&s)) {
+            temp = pop(&s);
+        } else {
+            return false;
+        }
+
+        arr[temp.row][temp.col] = UNASSIGNED;
+        i = temp.num;
+        sudokusolver(arr, len, s);
     }
 
     printf("%d is safe num\n", i);
-
     arr[row][col] = i;
-    sudokusolver(arr, len);
+
+    temp.col = col;
+    temp.row = row;
+    temp.num = arr[row][col];
+
+    if(!isfull(&s)) {
+        push(&s, temp);
+    } else {
+        return false;
+    }
+
+    i = 0;
+    sudokusolver(arr, len, s);
 
     return true;
 }
@@ -116,6 +145,7 @@ void printsudoku(int **arr, int len) {
 int main(int argc, char* argv[]) {
 
     int** sudoku;
+    stack s;
 
     /* first allocating memory to store address of integer pointer
      * then allocating each integer pointer memory to store integer
@@ -134,26 +164,28 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    sudoku[0][0] = 1;
-    sudoku[0][2] = 3;
-    sudoku[1][0] = 4;
-    sudoku[1][2] = 2;
-    sudoku[1][3] = 1;
-    sudoku[2][1] = 1;
-    sudoku[2][3] = 2;
-    sudoku[3][0] = 2;
-    sudoku[3][1] = 4;
+    // sudoku[0][0] = 1;
+    // sudoku[0][2] = 3;
+    // sudoku[1][0] = 4;
+    // sudoku[1][2] = 2;
+    // sudoku[1][3] = 1;
+    // sudoku[2][1] = 1;
+    // sudoku[2][3] = 2;
+    // sudoku[3][0] = 2;
+    // sudoku[3][1] = 4;
 
     // {
     //     1, 0, 3, 0
-    //     4, 0, 2, 1
+    //   (4), 0, 2, 1
     //     0, 1, 0, 2
     //     2, 4, 0, 0
     // }
+
+    init(&s);
     
     printsudoku(sudoku, SIZE);
 
-    if(sudokusolver(sudoku, SIZE)) {
+    if(sudokusolver(sudoku, SIZE, s)) {
         printsudoku(sudoku, SIZE);
     } else {
         printf("error\n");
