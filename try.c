@@ -11,10 +11,12 @@
 #define UNASSIGNED 0
 
 values peek(stack *s) {
+
     values val = pop(s);
     push(s, val);
     printf("(%d, %d, %d) is the top\n", val.row, val.col, val.num);
     return val;
+
 }
 
 /* issafe checks if the number num is safe to be filled in the cell.
@@ -28,7 +30,6 @@ bool issafe(int** arr, int len, int row, int col, int num) {
      * checkcol returns true if it is in column.
      * checkblock returns true if it is in block.
      */
-
 
     if(checkrow(arr, len, row, num) || checkcol(arr, len, col, num) || checkblock(arr, len, row, col, num)) {
         return false;
@@ -47,13 +48,15 @@ bool issafe(int** arr, int len, int row, int col, int num) {
  */
 
 bool findemptycell(int **arr, int len, int *row, int *col) {
+
     for(int x = 0; x < len; x++) {
         for(int y = 0; y < len; y++) {
-            // printf("x - %d, y - %d\n", x, y);
             if(checkemptycell(arr, len, x, y)) {
+             
                 *row = x;
                 *col = y;
                 return true;
+
             }
         }
     }
@@ -66,11 +69,13 @@ bool findemptycell(int **arr, int len, int *row, int *col) {
  */
 
 bool findsafenum(int **arr, int len, int row, int col, int *i) {
+
     for(int j = *i + 1; j <= len; j++) {
-        // printf("iterations %d\n", j);
+
         if(issafe(arr, len, row, col, j)) {
             *i = j;
             return true;
+
         }
     }
     // printf("now its false\n");
@@ -82,40 +87,77 @@ bool findsafenum(int **arr, int len, int row, int col, int *i) {
  * else returns false means sudoku can't be solved
  */
 
-bool sudokusolver(int **arr, int len) {
+bool sudokusolver(int **arr, int len, stack s) {
+
     int row, col;
-    int i = 0;
-    
+    static int i = 0;
+    values temp;
+
+    /* to get index row, col of empty cell 
+     */
     if(!findemptycell(arr, len, &row, &col)) {
+
         return true;
+
     }
 
-    printf("(%d, %d) is an empty cell\n", row, col);
-    
+    // printf("(%d, %d) is an empty cell\n", row, col);
+
+    /* to find safe number at location row, col
+    */
     if(!findsafenum(arr, len, row, col, &i)) {
-        return false;
+
+        /* if there is no safe number at that position,
+        * it backtracks.
+        * but if the stack becomes empty it returns false
+        * means the sudoku cannot be solved
+        */
+        if(!isempty(&s)) {
+            temp = pop(&s);
+        } else {
+            return false;
+        }
+
+        arr[temp.row][temp.col] = UNASSIGNED;
+        i = temp.num;
+        sudokusolver(arr, len, s);
+
     }
 
     printf("%d is safe num\n", i);
-
     arr[row][col] = i;
-    sudokusolver(arr, len);
+
+    temp.col = col;
+    temp.row = row;
+    temp.num = arr[row][col];
+
+    if(!isfull(&s)) {
+        push(&s, temp);
+    } else {
+        return false;
+    }
+
+    i = 0;
+    sudokusolver(arr, len, s);
 
     return true;
 }
 
 void printsudoku(int **arr, int len) {
+
     for(int i = 0; i < len; i++){
         for(int j = 0; j < len; j++){
             printf("%d ", arr[i][j]);
         }
         printf("\n");
     }
+
 }
 
 int main(int argc, char* argv[]) {
 
     int** sudoku;
+    stack s;
 
     /* first allocating memory to store address of integer pointer
      * then allocating each integer pointer memory to store integer
@@ -127,7 +169,6 @@ int main(int argc, char* argv[]) {
 
     /* Initializes the 2d array.
      */
-
     for(int i = 0; i < SIZE; i++) {
         for(int j = 0; j < SIZE; j++) {
             sudoku[i][j] = UNASSIGNED;
@@ -136,7 +177,6 @@ int main(int argc, char* argv[]) {
     
     sudoku[0][0] = 1;
     sudoku[0][2] = 3;
-    sudoku[1][0] = 4;
     sudoku[1][2] = 2;
     sudoku[1][3] = 1;
     sudoku[2][1] = 1;
@@ -146,19 +186,26 @@ int main(int argc, char* argv[]) {
 
     // {
     //     1, 0, 3, 0
-    //     4, 0, 2, 1
+    //     0, 0, 2, 1
     //     0, 1, 0, 2
     //     2, 4, 0, 0
     // }
+
+    init(&s);
+    
+    printsudoku(sudoku, SIZE);
+
+    if(sudokusolver(sudoku, SIZE, s)) {
+
         printsudoku(sudoku, SIZE);
 
-    if(sudokusolver(sudoku, SIZE)) {
-        printsudoku(sudoku, SIZE);
     } else {
+
         printf("error\n");
+
     }
 
-    printf("Hello");
+    printf("Complete\n");
     
     free(sudoku);
 
