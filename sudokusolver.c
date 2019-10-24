@@ -111,7 +111,7 @@ bool sudokusolver(int **arr, int len, stack s) {
 
     }
 
-    printf("%d is safe num\n", i);
+    // printf("%d is safe num\n", i);
     arr[row][col] = i;
 
     temp.col = col;

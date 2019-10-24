@@ -24,12 +24,14 @@
 
 void printsudoku(int **arr, int len) {
 
+    printf("=================\n");
     for(int i = 0; i < len; i++){
         for(int j = 0; j < len; j++){
             printf("%d ", arr[i][j]);
         }
         printf("\n");
     }
+    printf("=================\n");
 
 }
 
@@ -49,6 +51,7 @@ bool validatesudoku(int **arr, int len) {
             if(!issafe(arr, len, i, j, temp)) {
 				return false;
 			}
+            arr[i][j] = temp;
         }
     }
     return true;
@@ -127,6 +130,7 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
 	}
 
+
     if(sudokusolver(sudoku, sudokusize, s)) {
 
         printsudoku(sudoku, sudokusize);
@@ -137,6 +141,11 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
 
     }
+    // int row = 0, col = 0;
+    // while(findemptycell(sudoku, sudokusize, &row, &col)) {
+    //     printf("(%d, %d) is an empty cell\n", row, col);
+    //     sudoku[row][col] = 5;
+    // }
 
     printf("Complete\n");
     
