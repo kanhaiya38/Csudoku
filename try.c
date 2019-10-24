@@ -57,15 +57,26 @@ bool validatesudoku(int **arr, int len) {
     return true;
 }
 
+bool comparesudoku(int **arr1, int **arr2, int len) {
+    for(int i = 0; i < len; i++){
+        for(int j = 0; j < len; j++){
+            if(arr1[i][j] != arr2[i][j]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 int main(int argc, char* argv[]) {
 
-    int** sudoku;
+    int **sudoku, **solution;
     stack s;
-    FILE *fp;
+    FILE *fp, *fpsolve;
 	char ch;
     unsigned int sudokusize;
 
-    if(argc > 2) {
+    if(argc > 3) {
         errno = EINVAL;
         perror("usage");
         return errno;
@@ -74,10 +85,16 @@ int main(int argc, char* argv[]) {
     /*opening the file.
      */
     fp = fopen(argv[1], "r");
+    fpsolve = fopen(argv[2], "r");
 
     /* checking if the file is opened
      */
     if(fp == NULL) {
+        fprintf(stderr, "cannot open file %s\n", argv[1]);
+        return errno;
+    }
+
+    if(fpsolve == NULL) {
         fprintf(stderr, "cannot open file %s\n", argv[1]);
         return errno;
     }
@@ -99,13 +116,13 @@ int main(int argc, char* argv[]) {
         sudoku[i] = (int *)malloc(sudokusize * sizeof(int));
     }
 
-    /* Initializes the 2d array.
-     */
-    for(int i = 0; i < sudokusize; i++) {
-        for(int j = 0; j < sudokusize; j++) {
-            sudoku[i][j] = UNASSIGNED;
-        }
-    }
+    // /* Initializes the 2d array.
+    //  */
+    // for(int i = 0; i < sudokusize; i++) {
+    //     for(int j = 0; j < sudokusize; j++) {
+    //         sudoku[i][j] = UNASSIGNED;
+    //     }
+    // }
     
     /* getting input from a file in the sudoku
      */
@@ -148,8 +165,29 @@ int main(int argc, char* argv[]) {
     // }
 
     printf("Complete\n");
-    
+
+    solution = (int **)malloc(sudokusize * sizeof(int *));
+    for (int i = 0; i < sudokusize ; i++) {
+        solution[i] = (int *)malloc(sudokusize * sizeof(int));
+    }
+
+	for(int i = 0; i < sudokusize; i++) {
+		for(int j = 0; j < sudokusize; j++) {
+			while(!feof(fpsolve)) {
+				ch = fgetc(fpsolve);
+				if(isdigit(ch)) {
+					break;
+				}
+			}
+            solution[i][j] = ch - '0';
+		}
+	}
+
+    if(comparesudoku(sudoku, solution, sudokusize)) {
+        printf("correctly solved\n");
+    }
     free(sudoku);
+    free(solution);
 
     fclose(fp);
 
