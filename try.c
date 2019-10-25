@@ -158,11 +158,6 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
 
     }
-    // int row = 0, col = 0;
-    // while(findemptycell(sudoku, sudokusize, &row, &col)) {
-    //     printf("(%d, %d) is an empty cell\n", row, col);
-    //     sudoku[row][col] = 5;
-    // }
 
     printf("Complete\n");
 
