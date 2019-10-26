@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <math.h>
 #include "stack.h"
 #include "check.h"
@@ -69,6 +70,28 @@ bool findsafenum(int **arr, int len, int row, int col, int *i) {
     return false;
 }
 
+/* validatesudoku checks if the input sudoku is valid or not.
+ * if it is valid it returns true
+ * else it returns false.
+ */
+bool validatesudoku(int **arr, int len) {
+    int temp;
+	for(int i = 0; i < len; i++){
+        for(int j = 0; j < len; j++){
+            temp = arr[i][j];
+            arr[i][j] = 0;
+			if(temp == 0) {
+				continue;
+			}
+            if(!issafe(arr, len, i, j, temp)) {
+				return false;
+			}
+            arr[i][j] = temp;
+        }
+    }
+    return true;
+}
+
 /* sudokusolver solves the sudoku and 
  * returns true if the sudoku is solved.
  * else returns false means sudoku can't be solved
@@ -79,6 +102,11 @@ bool sudokusolver(int **arr, int len, stack s) {
     int row, col;
     static int i = 0;
     values temp;
+
+    if(!validatesudoku(arr, len)) {
+		printf("not a valid sudoku\n");
+        exit(EXIT_FAILURE);
+	}
 
     /* to get index row, col of empty cell 
      */

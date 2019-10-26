@@ -35,27 +35,7 @@ void printsudoku(int **arr, int len) {
 
 }
 
-/* validatesudoku checks if the input sudoku is valid or not.
- * if it is valid it returns true
- * else it returns false.
- */
-bool validatesudoku(int **arr, int len) {
-    int temp;
-	for(int i = 0; i < len; i++){
-        for(int j = 0; j < len; j++){
-            temp = arr[i][j];
-            arr[i][j] = 0;
-			if(temp == 0) {
-				continue;
-			}
-            if(!issafe(arr, len, i, j, temp)) {
-				return false;
-			}
-            arr[i][j] = temp;
-        }
-    }
-    return true;
-}
+
 
 bool comparesudoku(int **arr1, int **arr2, int len) {
     for(int i = 0; i < len; i++){
@@ -141,11 +121,6 @@ int main(int argc, char* argv[]) {
     init(&s);
     
     printsudoku(sudoku, sudokusize);
-
-	if(!validatesudoku(sudoku, sudokusize)) {
-		printf("not a valid sudoku\n");
-        exit(EXIT_FAILURE);
-	}
 
 
     if(sudokusolver(sudoku, sudokusize, s)) {
