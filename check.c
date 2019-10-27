@@ -82,3 +82,25 @@ bool checkblock(int **arr, int len, int row, int col, int num) {
 
     return false;
 }
+
+/* issafe checks if the number num is safe to be filled in the cell.
+ * if it is safe it returns true.
+ * else returns false.
+ */
+
+bool issafe(int** arr, int len, int row, int col, int num) {
+
+    /* checkrow returns true if it is in row.
+     * checkcol returns true if it is in column.
+     * checkblock returns true if it is in block.
+     */
+
+    if(checkrow(arr, len, row, num) || checkcol(arr, len, col, num) || checkblock(arr, len, row, col, num)) {
+        return false;
+    }
+
+    /* if it isn't in row, column, block it returns true.
+     */
+    
+    return true;
+}
