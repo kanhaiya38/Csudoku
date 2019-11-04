@@ -10,7 +10,7 @@
  * else it returns false.
  */
 
-bool checkemptycell(int **arr, int len, int row, int col) {
+bool check_empty_cell(int **arr, int len, int row, int col) {
 
     if(arr[row][col] == UNASSIGNED) {
         return true;
@@ -24,7 +24,7 @@ bool checkemptycell(int **arr, int len, int row, int col) {
  * else it returns false.
  */
 
-bool checkrow(int **arr, int len, int row, int num) {
+bool check_row(int **arr, int len, int row, int num) {
 
     for(int i = 0; i < len; i++) {
         if(arr[row][i] == num) {
@@ -35,12 +35,12 @@ bool checkrow(int **arr, int len, int row, int num) {
 
 }
 
-/* checkcol checks if number num is in col'th column.
+/* check_col checks if number num is in col'th column.
  * if it is in col'th column then it returns true.
  * else it returns false.
  */
 
-bool checkcol(int **arr, int len, int col, int num) {
+bool check_col(int **arr, int len, int col, int num) {
 
     for(int i = 0; i < len; i++) {
         if(arr[i][col] == num) {
@@ -51,12 +51,12 @@ bool checkcol(int **arr, int len, int col, int num) {
 
 }
 
-/* checkblock checks if number num is in the block.
+/* check_block checks if number num is in the block.
  * if it is in the block then it returns true.
  * else it returns false.
  */
 
-bool checkblock(int **arr, int len, int row, int col, int num) {
+bool check_block(int **arr, int len, int row, int col, int num) {
     
     int left, right, top, bottom;
     int size = (int)sqrt(len);
@@ -90,12 +90,12 @@ bool checkblock(int **arr, int len, int row, int col, int num) {
 
 bool issafe(int** arr, int len, int row, int col, int num) {
 
-    /* checkrow returns true if it is in row.
-     * checkcol returns true if it is in column.
-     * checkblock returns true if it is in block.
+    /* check_row returns true if it is in row.
+     * check_col returns true if it is in column.
+     * check_block returns true if it is in block.
      */
 
-    if(checkrow(arr, len, row, num) || checkcol(arr, len, col, num) || checkblock(arr, len, row, col, num)) {
+    if(check_row(arr, len, row, num) || check_col(arr, len, col, num) || check_block(arr, len, row, col, num)) {
         return false;
     }
 

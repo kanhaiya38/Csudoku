@@ -4,7 +4,7 @@
 
 void init(stack *s) {
     *s = NULL;
-    // printf("stack initialised\n");
+    printf("stack initialised\n");
 }
 
 void push(stack *s, values pushval) {
@@ -14,7 +14,7 @@ void push(stack *s, values pushval) {
     temp->val.col = pushval.col;
     temp->next = *s;
     *s = temp;
-    // printf("(%d, %d, %d) is pushed into stack\n", (*s)->val.row, (*s)->val.col, (*s)->val.num);
+    printf("(%d, %d, %d) is pushed into stack\n", (*s)->val.row, (*s)->val.col, (*s)->val.num);
 }
 
 values pop(stack *s) {
@@ -23,7 +23,7 @@ values pop(stack *s) {
     popval = (*s)->val;
     *s = (*s)->next;
     free(temp);
-    // printf("(%d, %d, %d) is poped from stack\n", popval.row, popval.col, popval.num);
+    printf("(%d, %d, %d) is poped from stack\n", popval.row, popval.col, popval.num);
     return popval;
 }
 

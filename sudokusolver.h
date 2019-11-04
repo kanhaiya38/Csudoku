@@ -1,9 +1,9 @@
 bool issafe(int** arr, int len, int row, int col, int num);
 
-bool findemptycell(int **arr, int len, int *row, int *col);
+bool find_empty_cell(int **arr, int len, int *row, int *col);
 
-bool findsafenum(int **arr, int len, int row, int col, int *i);
+bool find_safe_num(int **arr, int len, int row, int col, int *i);
 
-bool validatesudoku(int **arr, int len);
+bool valid_sudoku(int **arr, int len);
 
-bool sudokusolver(int **arr, int len, stack s);
+bool sudoku_solver(int **arr, int len);

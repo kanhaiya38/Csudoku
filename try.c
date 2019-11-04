@@ -13,17 +13,8 @@
 
 #define UNASSIGNED 0
 
-// values peek(stack *s) {
 
-//     values val = pop(s);
-//     push(s, val);
-//     printf("(%d, %d, %d) is the top\n", val.row, val.col, val.num);
-//     return val;
-
-// }
-
-
-void printsudoku(int **arr, int len) {
+void print_sudoku(int **arr, int len) {
 
     printf("=================\n");
     for(int i = 0; i < len; i++){
@@ -52,42 +43,41 @@ bool comparesudoku(int **arr1, int **arr2, int len) {
 int main(int argc, char* argv[]) {
 
     int **sudoku, **solution;
-    stack s;
-    // FILE *fp, *fpsolve;
-	// char ch;
+    FILE *fpproblem, *fpsolution;
+	char ch;
     unsigned int sudokusize = 9;
 
-    // if(argc > 3) {
-    //     errno = EINVAL;
-    //     perror("usage");
-    //     return errno;
-    // }
+    if(argc > 2) {
+        errno = EINVAL;
+        perror("usage");
+        return errno;
+    }
 
-    // /*opening the file.
-    //  */
-    // fp = fopen(argv[1], "r");
+    /*opening the file.
+     */
+    fpproblem = fopen(argv[1], "r");
     // fpsolve = fopen(argv[2], "r");
 
-    // /* checking if the file is opened
-    //  */
-    // if(fp == NULL) {
-    //     fprintf(stderr, "cannot open file %s\n", argv[1]);
-    //     return errno;
-    // }
+    /* checking if the file is opened
+     */
+    if(fpproblem == NULL) {
+        fprintf(stderr, "cannot open file %s\n", argv[1]);
+        return errno;
+    }
 
     // if(fpsolve == NULL) {
     //     fprintf(stderr, "cannot open file %s\n", argv[1]);
     //     return errno;
     // }
 
-    // while(!feof(fp)) {
-    //     ch = fgetc(fp);
-    //     if(isdigit(ch)) {
-    //         break;
-    //     }
-    // }
-    // sudokusize = ch - '0';
-    // printf("%d is sudoku size\n", sudokusize);
+    while(!feof(fpproblem)) {
+        ch = fgetc(fpproblem);
+        if(isdigit(ch)) {
+            break;
+        }
+    }
+    sudokusize = ch - '0';
+    printf("%d is sudoku size\n", sudokusize);
 
     /* first allocating memory to store address of integer pointer
      * then allocating each integer pointer memory to store integer
@@ -105,37 +95,39 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    // /* getting input from a file in the sudoku
-    //  */
-	// for(int i = 0; i < sudokusize; i++) {
-	// 	for(int j = 0; j < sudokusize; j++) {
-	// 		while(!feof(fp)) {
-	// 			ch = fgetc(fp);
-	// 			if(isdigit(ch)) {
-	// 				break;
-	// 			}
-	// 		}
-    //         sudoku[i][j] = ch - '0';
-	// 	}
-	// }
-
-    init(&s);
+    /* getting input from a file in the sudoku
+     */
+	for(int i = 0; i < sudokusize; i++) {
+		for(int j = 0; j < sudokusize; j++) {
+			while(!feof(fpproblem)) {
+				ch = fgetc(fpproblem);
+				if(isdigit(ch)) {
+					break;
+				}
+			}
+            sudoku[i][j] = ch - '0';
+		}
+	}
     
-    // printsudoku(sudoku, sudokusize);
+    print_sudoku(sudoku, sudokusize);
 
+    if(!valid_sudoku(sudoku, sudokusize)) {
+		printf("not a valid sudoku\n");
+        exit(EXIT_FAILURE);
+	}
 
-    // if(sudokusolver(sudoku, sudokusize, s)) {
+    if(sudoku_solver(sudoku, sudokusize)) {
 
-    //     printsudoku(sudoku, sudokusize);
+        print_sudoku(sudoku, sudokusize);
 
-    // } else {
+    } else {
 
-    //     printf("error\n");
-    //     exit(EXIT_FAILURE);
+        fprintf(stderr, "Cannot solve input sudoku\n");
+        exit(EXIT_FAILURE);
 
-    // }
+    }
 
-    // printf("Complete\n");
+    printf("Complete\n");
 
     // solution = (int **)malloc(sudokusize * sizeof(int *));
     // for (int i = 0; i < sudokusize ; i++) {
@@ -157,16 +149,18 @@ int main(int argc, char* argv[]) {
     // if(comparesudoku(sudoku, solution, sudokusize)) {
     //     printf("correctly solved\n");
     // }
-    // free(sudoku);
+    free(sudoku);
     // free(solution);
 
-    // fclose(fp);
+    fclose(fpproblem);
 
-    if(generate_sudoku(sudoku, sudokusize, s)) {
-        printsudoku(sudoku, sudokusize);
-    } else {
-        printf("false\n");
-    }
+
+
+    // if(generate_sudoku(sudoku, sudokusize)) {
+    //     printsudoku(sudoku, sudokusize);
+    // } else {
+    //     printf("false\n");
+    // }
 
     return 0;
 }
