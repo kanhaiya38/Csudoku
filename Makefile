@@ -1,17 +1,41 @@
-try : try.o sudokusolver.o sudokugenerator.o check.o stack.o
-	gcc -o try try.o sudokusolver.o sudokugenerator.o check.o stack.o -Wall
+# change application name here (executable output name)
+TARGET = sudoku
 
-try.o : try.c
-	gcc -c try.c -Wall
+# compiler
+CC = gcc
 
-sudokusolver.o : sudokusolver.c sudokusolver.h
-	gcc -c sudokusolver.c -Wall
+# optimisation
+OPT = -O
 
-sudokugenerator.o : sudokugenerator.c sudokugenerator.h
-	gcc -c sudokugenerator.c -Wall
+# warnings
+WARN = -Wall
 
-check.o : check.c check.h
-	gcc -c check.c -Wall
+CCFLAGS=$(DEBUG) $(OPT) $(WARN)
 
-stack.o : stack.c stack.h
-	gcc -c stack.c -Wall
+# linker
+LD = gcc
+
+OBJS = main.o sudokusolver.o sudokugenerator.o \
+check.o stack.o
+
+all : $(OBJS)
+	$(LD) -o $(TARGET) $(OBJS)
+
+main.o : src/main.c
+	$(CC) -c $(CCFLAGS) src/main.c
+
+sudokusolver.o : src/sudokusolver.c headers/sudokusolver.h
+	$(CC) -c $(CCFLAGS) src/sudokusolver.c
+
+sudokugenerator.o : src/sudokugenerator.c headers/sudokugenerator.h
+	$(CC) -c $(CCFLAGS) src/sudokugenerator.c
+
+check.o : src/check.c headers/check.h
+	$(CC) -c $(CCFLAGS) src/check.c
+
+stack.o : src/stack.c headers/stack.h
+	$(CC) -c $(CCFLAGS) src/stack.c
+
+.PHONY : clean
+clean:
+	rm *.o $(TARGET)
