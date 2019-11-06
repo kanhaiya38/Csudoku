@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
@@ -9,24 +10,129 @@
 #include "../headers/sudokusolver.h"
 #include "../headers/sudokugenerator.h"
 #include "../headers/check.h"
+#include "../headers/file.h"
 
 
 #define UNASSIGNED 0
 
+// bool init_sudoku(int **arr, int len) {
 
+//     /* first allocating memory to store address of integer pointer
+//      * then allocating each integer pointer memory to store integer
+//      */
+//     arr = (int **)malloc(len * sizeof(int *));
+
+//     if(arr == NULL) {
+    
+//         fprintf(stderr, "Memory allocation failed\n");
+    
+//         return false;
+//     }
+
+//     for (int i = 0; i < len ; i++) {
+    
+//         arr[i] = (int *)malloc(len * sizeof(int));
+
+//         if(arr[i] == NULL) {
+    
+//             fprintf(stderr, "Memory allocation failed\n");
+    
+//             return false;
+    
+//         }
+    
+//     }
+
+//     return true;
+
+// }
+
+void blue() {
+    printf("\033[0;36m");
+}
+
+void green() {
+    printf("\033[1;32m");
+}
+
+void reset() {
+    printf("\033[0m");
+}
+
+/* print_sudoku prints len * len sudokuboard
+ */
 void print_sudoku(int **arr, int len) {
 
-    printf("=================\n");
-    for(int i = 0; i < len; i++){
-        for(int j = 0; j < len; j++){
-            printf("%d ", arr[i][j]);
+    register int i, j;
+
+    int size = sqrt(len);
+
+    for(i = 0; i <= 2 * len; i++){
+
+        for(j = 0; j < len; j++) {
+
+            if(i % (2 * size) == 0) {
+                blue();
+                printf("+---");
+                if(size > 3) {
+                    printf("-");
+                }
+                reset();
+            } else if(i % 2 == 0) {
+                if(j % size == 0) {
+                    blue();
+                    printf("+");
+                    green();
+                    printf("---");
+                    if(size > 3) {
+                        printf("-");
+                    }
+                    reset();
+                } else {
+                    green();
+                    printf("+");
+                    printf("---");
+                    if(size > 3) {
+                        printf("-");
+                    }
+                    reset();
+                }
+            } else {
+                if(j % size == 0) {
+                    blue();
+                    printf("|");
+                    reset();
+                    if(size > 3) {
+                        printf(" %2d ", arr[(i - 1) / 2][j]);
+                    } else {
+                        printf(" %d ", arr[(i - 1) / 2][j]);
+                    }
+                } else {
+                    green();
+                    printf("|");
+                    reset();
+                    if(size > 3) {
+                        printf(" %2d ", arr[(i - 1) / 2][j]);
+                    } else {
+                        printf(" %d ", arr[(i - 1) / 2][j]);
+                    }
+                }
+            }
+
+        }
+        if(i % 2 == 0) {
+            blue();
+            printf("+");
+            reset();
+        } else {
+            blue();
+            printf("|");
+            reset();
         }
         printf("\n");
     }
-    printf("=================\n");
 
 }
-
 
 
 bool comparesudoku(int **arr1, int **arr2, int len) {
@@ -42,125 +148,87 @@ bool comparesudoku(int **arr1, int **arr2, int len) {
 
 int main(int argc, char* argv[]) {
 
-    int **sudoku, **solution;
-    FILE *fpproblem, *fpsolution;
-	char ch;
-    unsigned int sudokusize = 9;
+    int **sudoku = NULL;
+    char file_name[128];
+    unsigned int sudokusize = 25;
+    register int i;
 
+    // scanf("%u", &sudokusize);
+    
+    strcpy(file_name, "2x2.txt");
+    printf("%s is file name\n", file_name);
     if(argc > 2) {
         errno = EINVAL;
         perror("usage");
         return errno;
     }
 
-    /*opening the file.
-     */
-    fpproblem = fopen(argv[1], "r");
-    // fpsolve = fopen(argv[2], "r");
-
-    /* checking if the file is opened
-     */
-    if(fpproblem == NULL) {
-        fprintf(stderr, "cannot open file %s\n", argv[1]);
-        return errno;
-    }
-
-    // if(fpsolve == NULL) {
-    //     fprintf(stderr, "cannot open file %s\n", argv[1]);
-    //     return errno;
+    // if(!init_sudoku(sudoku, sudokusize)) {
+    //     fprintf(stderr, "Not enough memory\n");
+    //     return EXIT_FAILURE;
     // }
-
-    while(!feof(fpproblem)) {
-        ch = fgetc(fpproblem);
-        if(isdigit(ch)) {
-            break;
-        }
-    }
-    sudokusize = ch - '0';
-    printf("%d is sudoku size\n", sudokusize);
-
+    
     /* first allocating memory to store address of integer pointer
      * then allocating each integer pointer memory to store integer
      */
     sudoku = (int **)malloc(sudokusize * sizeof(int *));
-    for (int i = 0; i < sudokusize ; i++) {
+    if(sudoku == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return false;
+    }
+    for (i = 0; i < sudokusize ; i++) {
         sudoku[i] = (int *)malloc(sudokusize * sizeof(int));
+        if(sudoku[i] == NULL) {
+            fprintf(stderr, "Memory allocation failed\n");
+            return false;
+        }
     }
 
-    /* Initializes the 2d array.
-     */
-    for(int i = 0; i < sudokusize; i++) {
+    if(argc == 2) {
+        
+        if(get_sudoku_from_file(sudoku, sudokusize, file_name)) {
+            printf("File successfully opened\n");
+        } else {
+            printf("cannot open file\n");
+            return EXIT_FAILURE;
+        }
+    }
+
+    for(i = 0; i < sudokusize; i++) {
         for(int j = 0; j < sudokusize; j++) {
             sudoku[i][j] = UNASSIGNED;
         }
     }
-    
-    /* getting input from a file in the sudoku
-     */
-	for(int i = 0; i < sudokusize; i++) {
-		for(int j = 0; j < sudokusize; j++) {
-			while(!feof(fpproblem)) {
-				ch = fgetc(fpproblem);
-				if(isdigit(ch)) {
-					break;
-				}
-			}
-            sudoku[i][j] = ch - '0';
-		}
-	}
-    
-    print_sudoku(sudoku, sudokusize);
 
-    if(!valid_sudoku(sudoku, sudokusize)) {
-		printf("not a valid sudoku\n");
-        exit(EXIT_FAILURE);
-	}
+    // print_sudoku(sudoku, sudokusize);
 
-    if(sudoku_solver(sudoku, sudokusize)) {
-
-        print_sudoku(sudoku, sudokusize);
-
-    } else {
-
-        fprintf(stderr, "Cannot solve input sudoku\n");
-        exit(EXIT_FAILURE);
-
-    }
-
-    printf("Complete\n");
-
-    // solution = (int **)malloc(sudokusize * sizeof(int *));
-    // for (int i = 0; i < sudokusize ; i++) {
-    //     solution[i] = (int *)malloc(sudokusize * sizeof(int));
-    // }
-
-	// for(int i = 0; i < sudokusize; i++) {
-	// 	for(int j = 0; j < sudokusize; j++) {
-	// 		while(!feof(fpsolve)) {
-	// 			ch = fgetc(fpsolve);
-	// 			if(isdigit(ch)) {
-	// 				break;
-	// 			}
-	// 		}
-    //         solution[i][j] = ch - '0';
-	// 	}
+    // if(!valid_sudoku(sudoku, sudokusize)) {
+	// 	printf("not a valid sudoku\n");
+    //     return EXIT_FAILURE;
 	// }
 
-    // if(comparesudoku(sudoku, solution, sudokusize)) {
-    //     printf("correctly solved\n");
-    // }
-    free(sudoku);
-    // free(solution);
+    // if(sudoku_solver(sudoku, sudokusize)) {
 
-    fclose(fpproblem);
+    //     print_sudoku(sudoku, sudokusize);
 
-
-
-    // if(generate_sudoku(sudoku, sudokusize)) {
-    //     printsudoku(sudoku, sudokusize);
     // } else {
-    //     printf("false\n");
+
+    //     fprintf(stderr, "Cannot solve input sudoku\n");
+    //     return EXIT_FAILURE;
+
     // }
 
-    return 0;
+    // printf("Complete\n");
+
+    if(generate_sudoku(sudoku, sudokusize)) {
+        print_sudoku(sudoku, sudokusize);
+    } else {
+        printf("false\n");
+    }
+
+    // print_sudoku(sudoku, sudokusize);
+    // if(valid_sudoku(sudoku, sudokusize))
+    //     printf("gr8 amn\n");
+    free(sudoku);
+    return EXIT_SUCCESS;
 }

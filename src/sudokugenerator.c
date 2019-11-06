@@ -9,9 +9,40 @@
 
 #define UNASSIGNED 0
 
-// int get_random_num(int max) {
-//     return rand() % max + 1;
-// }
+/* get_random_int returns a unique random integer from array randomarr
+ * which has unique numbers from 1 to len
+ * it generates random number-randomindex and returns
+ * number at index randomindex of randomarr
+ * and swaps that number with  
+ */
+
+int get_random_num(int max) {
+    /* 25 since max sudoku size is 25
+     */
+    static unsigned int randomarr[25];
+    unsigned int randomindex, swap, randomnum;
+    static bool flag = true;
+    register int k;
+
+    srand(time(0));
+
+    if(flag) {
+        for(k = 0; k < max; k++) {
+            /* unique values from 1 to len are stored in randomarr
+            */
+            randomarr[k] = k + 1;
+        }
+        flag = false;
+    }
+
+    
+    randomindex = rand() % max;
+    randomnum = randomarr[randomindex];
+    swap = randomarr[randomindex];
+    randomarr[randomindex] = randomarr[max - 1];
+    randomarr[max - 1] = swap;
+    return randomnum;
+}
 
 /* fill_diagonal fills all the diagonal blocks as
  * all diagonal cells can be filled randomly
@@ -20,116 +51,75 @@
  */
 bool fill_diagonal(int **arr, int len) {
     
-    int size;
-    int max;
-    int randomarr[len], randomnum, randomindex;
-    int i, j, k;
-    int swap;
-
-    size = (int)sqrt(len);
-    // printf("%d is size\n", size);
-
-    srand(time(0));
-    
-    for(k = 0; k < len; k++) {
-        randomarr[k] = k + 1;
-    }
-
-    for(i = 0; i < len; i++) {
-
-        if(i % size == 0) {
-            max = len;
-        }
-
-        for(j = (i / size) * size; j < (i / size + 1) * size; j++) {
-
-            // printf("[");
-            // for(k = 0; k < len; k++) {
-            //     printf("%d ", randomarr[k]);
-            // }
-            // printf("]\n");
-
-            randomindex = rand() % max;
-            // printf("%d is random index\n", randomindex);
-            randomnum = randomarr[randomindex];
-            // printf("%d is randomnum\n", randomnum);
-            // printf("%d is at randomarr[randomindex]:before\n", randomarr[randomindex]);
-            // printf("%d is last:before\n", randomarr[max - 1]);
-            swap = randomarr[randomindex];
-            // printf("%d is swap\n", swap);
-            // printf("%d is max\n", max);
-            randomarr[randomindex] = randomarr[max - 1];
-            // printf("%d is at randomarr[randomindex]\n", randomarr[randomindex]);
-            randomarr[max - 1] = swap;
-            // printf("%d is last\n", randomarr[max - 1]);
-            max--;
-
-            arr[i][j] = randomnum;
-        }
-    }
-
-    return true;
-}
-
-bool fill_more_cells(int **arr, int len) {
-    int size;
-    int max;
-    int randomarr[len], randomnum, randomindex;
-    int i, j, k;
-    int swap;
+    unsigned int size;
+    unsigned int max;
+    unsigned int randomnum;
+    register int i, j, k;
 
     size = (int)sqrt(len);
 
-    srand(time(0));
-    
-    for(k = 0; k < len; k++) {
-        randomarr[k] = k + 1;
-    }
-
-    for(i = 0; i < len; i++) {
-
+    for(k = 0; k < size; k++) {
         max = len;
-        
-        for(j = 0; j < len; j++) {
-            if(arr[i][j] != UNASSIGNED) {
-                continue;
+        for(i = k * size; i < (k + 1) * size; i++) {
+            for(j = k * size; j < (k + 1) * size; j++) {
+                randomnum = get_random_num(max);
+                max--;
+                arr[i][j] = randomnum;
             }
-            randomindex = rand() % max;
-            randomnum = randomarr[randomindex];
-            if(!issafe(arr, len, i, j, randomnum)) {
-                continue;
-            }
-            swap = randomarr[randomindex];
-            randomarr[randomindex] = randomarr[max - 1];
-            randomarr[max - 1] = swap;
-            max--;
+        }
+    }
 
-            arr[i][j] = randomnum;
+    return true;
+}
+
+
+bool fill_some_cells(int **arr, int len) {
+    register int i, j;
+    unsigned int max;
+    unsigned int randomnum;
+    for(i = 0; i < len; i++){
+        max = len;
+        for(j = 0; j < len; j++) {
+            randomnum = get_random_num(max);
+            if(issafe(arr, len, i, j, randomnum)) {
+                arr[i][j] = randomnum;
+            }
+            max--;
         }
     }
     return true;
 }
 
-bool generate_sudoku(int **arr, int len, stack s) {
-    
-    fill_diagonal(arr, len);
-    fill_more_cells(arr, len);
-    printf("=================\n");
-    for(int i = 0; i < len; i++){
-        for(int j = 0; j < len; j++){
-            printf("%d ", arr[i][j]);
-        }
-        printf("\n");
-    }
-    printf("=================\n");
-    printf("her\n");
-    sudoku_solver(arr, len);
-    
-    // int i = 5;
-    // while(i--) {
-    //     printf("%d is \n", get_random_num(len));
-    // }
+bool generate_sudoku(int **arr, int len) {
 
+    register int i, j;
+    /* Initializes the 2d array.
+     */
+    for(i = 0; i < len; i++) {
+        for(j = 0; j < len; j++) {
+            arr[i][j] = UNASSIGNED;
+        }
+    }
+    
+    if(len > 4){
+        fill_diagonal(arr, len);
+    } else {
+        fill_some_cells(arr, len);
+    }
+
+    // if(len < 25)
+
+    if(valid_sudoku(arr, len)) {
+        printf("sudoku is valid\n");
+        if(sudoku_solver(arr, len)) {
+            printf("sudoku solved\n");
+        } else {
+            printf("cannot solve sudoku\n");
+        }
+    } else {
+        printf("sudoku is not valid\n");
+    }
+    
     return true;
     
 }

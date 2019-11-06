@@ -34,7 +34,9 @@ bool check_empty_cell(int **arr, int len, int row, int col) {
 
 bool check_row(int **arr, int len, int row, int num) {
 
-    for(int i = 0; i < len; i++) {
+    register int i;
+
+    for(i = 0; i < len; i++) {
 
         if(arr[row][i] == num) {
 
@@ -56,7 +58,9 @@ bool check_row(int **arr, int len, int row, int num) {
 
 bool check_col(int **arr, int len, int col, int num) {
 
-    for(int i = 0; i < len; i++) {
+    register int i;
+
+    for(i = 0; i < len; i++) {
 
         if(arr[i][col] == num) {
 
@@ -82,6 +86,8 @@ bool check_block(int **arr, int len, int row, int col, int num) {
 
     int size = (int)sqrt(len);
 
+    register int i, j;
+
     /* to find the boundaries of the block.
     */
 
@@ -96,9 +102,9 @@ bool check_block(int **arr, int len, int row, int col, int num) {
     /* to find if the num is in the block.
     */
 
-    for(int i = top; i < bottom; i++) {
+    for(i = top; i < bottom; i++) {
 
-        for(int j = left; j < right; j++) {
+        for(j = left; j < right; j++) {
 
             if(arr[i][j] == num) {
 

@@ -27,7 +27,7 @@ void push(stack *s, values pushval) {
 
     *s = temp;
 
-    printf("(%d, %d, %d) is pushed into stack\n", (*s)->val.row, (*s)->val.col, (*s)->val.num);
+    // printf("(%d, %d, %d) is pushed into stack\n", (*s)->val.row, (*s)->val.col, (*s)->val.num);
 
 }
 
@@ -43,7 +43,7 @@ values pop(stack *s) {
 
     free(temp);
 
-    printf("(%d, %d, %d) is poped from stack\n", popval.row, popval.col, popval.num);
+    // printf("(%d, %d, %d) is poped from stack\n", popval.row, popval.col, popval.num);
 
     return popval;
 

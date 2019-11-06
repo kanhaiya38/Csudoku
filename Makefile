@@ -13,16 +13,19 @@ WARN = -Wall
 CCFLAGS=$(DEBUG) $(OPT) $(WARN)
 
 # linker
-LD = gcc
+LD = -lm
 
 OBJS = main.o sudokusolver.o sudokugenerator.o \
-check.o stack.o
+check.o stack.o file.o
 
 all : $(OBJS)
-	$(LD) -o $(TARGET) $(OBJS)
+	$(CC) -o $(TARGET) $(OBJS) $(LD)
 
 main.o : src/main.c
 	$(CC) -c $(CCFLAGS) src/main.c
+
+file.o : src/file.c headers/file.h
+	$(CC) -c $(CCFLAGS) src/file.c
 
 sudokusolver.o : src/sudokusolver.c headers/sudokusolver.h
 	$(CC) -c $(CCFLAGS) src/sudokusolver.c
