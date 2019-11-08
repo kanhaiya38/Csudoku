@@ -4,6 +4,9 @@ TARGET = sudoku
 # compiler
 CC = gcc
 
+# gdb
+DEBUG = -g
+
 # optimisation
 OPT = -O
 
@@ -16,13 +19,16 @@ CCFLAGS=$(DEBUG) $(OPT) $(WARN)
 LD = -lm
 
 OBJS = main.o sudokusolver.o sudokugenerator.o \
-check.o stack.o file.o
+check.o stack.o file.o menu.o
 
 all : $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS) $(LD)
 
 main.o : src/main.c
 	$(CC) -c $(CCFLAGS) src/main.c
+	
+menu.o : src/menu.c headers/menu.h
+	$(CC) -c $(CCFLAGS) src/menu.c
 
 file.o : src/file.c headers/file.h
 	$(CC) -c $(CCFLAGS) src/file.c

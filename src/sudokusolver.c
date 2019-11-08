@@ -74,6 +74,19 @@ bool find_safe_num(int **arr, int len, int row, int col, int *i) {
     return false;
 }
 
+bool valid_sudoku_size(unsigned int len) {
+    switch(len) {
+    case 4: case 9: case 16: case 25:
+        return true;
+        break;
+    
+    default:
+        break;
+    }
+
+    return false;
+}
+
 /* valid_sudoku checks if the input sudoku is valid or not.
  * if it is valid it returns true
  * else it returns false.

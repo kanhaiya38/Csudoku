@@ -90,7 +90,7 @@ bool fill_some_cells(int **arr, int len) {
     return true;
 }
 
-bool generate_sudoku(int **arr, int len) {
+bool generate_seed(int **arr, int len) {
 
     register int i, j;
     /* Initializes the 2d array.
@@ -122,4 +122,57 @@ bool generate_sudoku(int **arr, int len) {
     
     return true;
     
+}
+
+bool remove_k_elements(int **seed_sudoku, int **sudoku, int len) {
+    
+    
+    // get_random_num(max);
+    return true;
+}
+
+bool sudoku_generator(int **arr, int len) {
+    int **seed_sudoku, **sudoku;
+
+    int sudokusize = len;
+    register int i;
+
+    /* first allocating memory to store address of integer pointer
+     * then allocating each integer pointer memory to store integer
+     */
+    sudoku = (int **)malloc(sudokusize * sizeof(int *));
+    if(sudoku == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return false;
+    }
+    for (i = 0; i < sudokusize ; i++) {
+        sudoku[i] = (int *)malloc(sudokusize * sizeof(int));
+        if(sudoku[i] == NULL) {
+            fprintf(stderr, "Memory allocation failed\n");
+            return false;
+        }
+    }
+
+
+    /* first allocating memory to store address of integer pointer
+     * then allocating each integer pointer memory to store integer
+     */
+    seed_sudoku = (int **)malloc(sudokusize * sizeof(int *));
+    if(seed_sudoku == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return false;
+    }
+    for (i = 0; i < sudokusize ; i++) {
+        seed_sudoku[i] = (int *)malloc(sudokusize * sizeof(int));
+        if(seed_sudoku[i] == NULL) {
+            fprintf(stderr, "Memory allocation failed\n");
+            return false;
+        }
+    }
+
+    generate_seed(seed_sudoku, len);
+
+    remove_k_elements(sudoku, seed_sudoku, len);
+
+
 }
