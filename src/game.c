@@ -43,8 +43,10 @@ bool sudoku_game(int len) {
         }
     }
 
-    sudoku_generator(problem_sudoku, seed_sudoku, len);
+    for(i = 0; i < 100; i++) {
+        sudoku_generator(problem_sudoku, seed_sudoku, len);
     print_sudoku(problem_sudoku, len);
+    }
     puts("yeah");
     return false;
 }

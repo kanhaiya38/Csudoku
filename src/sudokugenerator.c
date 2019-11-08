@@ -10,6 +10,14 @@
 
 #define UNASSIGNED 0
 
+unsigned int random_num(unsigned int max) {
+    /* 25 since max sudoku size is 25
+     */
+
+    srand(time(0));
+    return rand() % max;
+}
+
 /* get_random_int returns a unique random integer from array randomarr
  * which has unique numbers from 1 to len
  * it generates random number-randomindex and returns
@@ -24,8 +32,8 @@ unsigned int get_random_num(unsigned int max) {
     unsigned int randomindex, swap, randomnum;
     static bool flag = true;
     register int k;
-
-    srand(time(0));
+    time_t tt;
+    srand(time(&tt));
 
     if(flag) {
         for(k = 0; k < max; k++) {
@@ -139,21 +147,23 @@ bool generate_seed(int **arr, int len) {
 
 void remove_k_elements(int **arr, int len, unsigned int k) {
     
-    unsigned int row, col, max;
-    register int i;
+    unsigned int row, col = 0, max;
+    register int i = 0;
 
     max = len;
 
-    for(i = 0; i < k; i++) {
-        row = get_random_num(max);
-        col = get_random_num(max);
+    while(k) {
+        row = rand() % (len - 1) + 1;
+        col = rand() % (len - 1) + 1;
         printf("(%d, %d) is random row, col\n", row, col);
-        /* row - 1, col - 1 because random number is generated 
-         * from 1 to max(len);
-         */
-        arr[row - 1][col - 1] = UNASSIGNED;
+        k--;
+        if(arr[row][col] == UNASSIGNED) {
+            continue;
+        }
+        arr[row][col] = UNASSIGNED;
+        i++;
     }
-    // return true;
+    printf("%d empty\n", i);
 }
 
 bool sudoku_generator(int **problem_sudoku, int **seed_sudoku, int len) {
@@ -172,7 +182,7 @@ bool sudoku_generator(int **problem_sudoku, int **seed_sudoku, int len) {
     copy_sudoku(seed_sudoku, problem_sudoku, len);
 
     // k = get_random_num(len);
-    k = 20;
+    k = (len * len / 2) + (len * len / 4);
     printf("removing %u elem\n", k);
 
     remove_k_elements(problem_sudoku, len, k);
