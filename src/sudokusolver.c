@@ -34,7 +34,7 @@ bool issafe(int** arr, int len, int row, int col, int num) {
 
 }
 
-/* findemptycell finds the empty cell in the sodoku
+/* find_empty_cell finds the empty cell in the sodoku
  * and returns true if there is an empty cell and
  * the position of the empty cell.
  * If no cell in the sudoku is empty it returns false.
@@ -57,7 +57,7 @@ bool find_empty_cell(int **arr, int len, int *row, int *col) {
     return false;
 }
 
-/* findsafenum finds the safe number for that empty cell and returns true.
+/* find_safe_num finds the safe number for that empty cell and returns true.
  * if there's no safe number then it returns false. 
  */
 
@@ -71,11 +71,23 @@ bool find_safe_num(int **arr, int len, int row, int col, int *i) {
 
         }
     }
-    // printf("now its false\n");
     return false;
 }
 
-/* validatesudoku checks if the input sudoku is valid or not.
+bool valid_sudoku_size(unsigned int len) {
+    switch(len) {
+    case 4: case 9: case 16: case 25:
+        return true;
+        break;
+    
+    default:
+        break;
+    }
+
+    return false;
+}
+
+/* valid_sudoku checks if the input sudoku is valid or not.
  * if it is valid it returns true
  * else it returns false.
  */
@@ -106,7 +118,7 @@ bool valid_sudoku(int **arr, int len) {
 bool sudoku_solver(int **arr, int len) {
 
     int row, col;
-    static int i = 0;
+    int i = 0;
     values temp;
     stack s;
     init(&s);

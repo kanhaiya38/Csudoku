@@ -1,0 +1,21 @@
+commands to be added
+Q - quit
+H - help
+
+
+//In sudoku generator
+
+h - hint
+u - undo
+r - redo
+r - clear
+n - start new
+s - solve partially solved
+b - to go one stage back
+x - delete
+
+
+// can be done
+highlighting wrong element
+remaining digit count
+time counter

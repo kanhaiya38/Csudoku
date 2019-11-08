@@ -1,1 +1,1 @@
-bool generate_sudoku(int **arr, int len);
+bool sudoku_generator(int **problem_sudoku, int **seed_sudoku, int len);
