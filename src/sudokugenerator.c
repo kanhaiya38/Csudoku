@@ -6,6 +6,7 @@
 #include "../headers/stack.h"
 #include "../headers/check.h"
 #include "../headers/sudokusolver.h"
+#include "../headers/print.h"
 
 #define UNASSIGNED 0
 
@@ -16,7 +17,7 @@
  * and swaps that number with  
  */
 
-int get_random_num(int max) {
+unsigned int get_random_num(unsigned int max) {
     /* 25 since max sudoku size is 25
      */
     static unsigned int randomarr[25];
@@ -42,6 +43,16 @@ int get_random_num(int max) {
     randomarr[randomindex] = randomarr[max - 1];
     randomarr[max - 1] = swap;
     return randomnum;
+}
+
+void copy_sudoku(int **seed_sudoku, int **problem_sudoku, int len) {
+    register int i , j;
+
+    for(i = 0; i < len; i++) {
+        for(j = 0; j < len; j++) {
+            problem_sudoku[i][j] = seed_sudoku[i][j];
+        }
+    }
 }
 
 /* fill_diagonal fills all the diagonal blocks as
@@ -77,7 +88,7 @@ bool fill_some_cells(int **arr, int len) {
     register int i, j;
     unsigned int max;
     unsigned int randomnum;
-    for(i = 0; i < len; i++){
+    for(i = 0; i < 1; i++){
         max = len;
         for(j = 0; j < len; j++) {
             randomnum = get_random_num(max);
@@ -107,6 +118,8 @@ bool generate_seed(int **arr, int len) {
         fill_some_cells(arr, len);
     }
 
+    // print_sudoku(arr, len);
+
     // if(len < 25)
 
     if(valid_sudoku(arr, len)) {
@@ -124,55 +137,45 @@ bool generate_seed(int **arr, int len) {
     
 }
 
-bool remove_k_elements(int **seed_sudoku, int **sudoku, int len) {
+void remove_k_elements(int **arr, int len, unsigned int k) {
     
-    
-    // get_random_num(max);
-    return true;
-}
-
-bool sudoku_generator(int **arr, int len) {
-    int **seed_sudoku, **sudoku;
-
-    int sudokusize = len;
+    unsigned int row, col, max;
     register int i;
 
-    /* first allocating memory to store address of integer pointer
-     * then allocating each integer pointer memory to store integer
-     */
-    sudoku = (int **)malloc(sudokusize * sizeof(int *));
-    if(sudoku == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
-        return false;
-    }
-    for (i = 0; i < sudokusize ; i++) {
-        sudoku[i] = (int *)malloc(sudokusize * sizeof(int));
-        if(sudoku[i] == NULL) {
-            fprintf(stderr, "Memory allocation failed\n");
-            return false;
-        }
-    }
+    max = len;
 
+    for(i = 0; i < k; i++) {
+        row = get_random_num(max);
+        col = get_random_num(max);
+        printf("(%d, %d) is random row, col\n", row, col);
+        /* row - 1, col - 1 because random number is generated 
+         * from 1 to max(len);
+         */
+        arr[row - 1][col - 1] = UNASSIGNED;
+    }
+    // return true;
+}
 
-    /* first allocating memory to store address of integer pointer
-     * then allocating each integer pointer memory to store integer
-     */
-    seed_sudoku = (int **)malloc(sudokusize * sizeof(int *));
-    if(seed_sudoku == NULL) {
-        fprintf(stderr, "Memory allocation failed\n");
-        return false;
-    }
-    for (i = 0; i < sudokusize ; i++) {
-        seed_sudoku[i] = (int *)malloc(sudokusize * sizeof(int));
-        if(seed_sudoku[i] == NULL) {
-            fprintf(stderr, "Memory allocation failed\n");
-            return false;
-        }
-    }
+bool sudoku_generator(int **problem_sudoku, int **seed_sudoku, int len) {
+    // int **seed_sudoku, **problem_sudoku;
+
+    // int sudokusize = len;
+    register int i;
+    unsigned int k;
+
+    
 
     generate_seed(seed_sudoku, len);
 
-    remove_k_elements(sudoku, seed_sudoku, len);
+    /* copying all elements of seed_sudoku to problem_sudoku
+     */
+    copy_sudoku(seed_sudoku, problem_sudoku, len);
 
+    // k = get_random_num(len);
+    k = 20;
+    printf("removing %u elem\n", k);
 
+    remove_k_elements(problem_sudoku, len, k);
+
+    return true;
 }
