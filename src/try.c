@@ -1,166 +1,177 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <math.h>
-#include <limits.h>
-#include <errno.h>
-#include <ctype.h>
-#include "stack.h"
-#include "sudokusolver.h"
-#include "sudokugenerator.h"
-#include "check.h"
-
+#include <time.h>
+#include "../headers/stack.h"
+#include "../headers/check.h"
+#include "../headers/sudokusolver.h"
+#include "../headers/print.h"
+#include "../headers/baseseed.h"
 
 #define UNASSIGNED 0
 
+/* get_random_int returns a unique random integer from array randomarr
+ * which has unique numbers from 1 to len
+ * it generates random number-randomindex and returns
+ * number at index randomindex of randomarr
+ * and swaps that number with  
+ */
 
-void print_sudoku(int **arr, int len) {
+unsigned int get_random_num(unsigned int min, unsigned int max) {
+    /* 25 since max sudoku size is 25
+     */
+    unsigned int randomnum;
 
-    printf("=================\n");
-    for(int i = 0; i < len; i++){
-        for(int j = 0; j < len; j++){
-            printf("%d ", arr[i][j]);
+    randomnum = rand() % (max - min + 1) + min;
+
+    return randomnum;
+}
+
+void copy_sudoku(int **source, int **copy, int len) {
+    register int i , j;
+
+    for(i = 0; i < len; i++) {
+        for(j = 0; j < len; j++) {
+            copy[i][j] = source[i][j];
         }
-        printf("\n");
     }
-    printf("=================\n");
-
 }
 
 
 
-bool comparesudoku(int **arr1, int **arr2, int len) {
-    for(int i = 0; i < len; i++){
-        for(int j = 0; j < len; j++){
-            if(arr1[i][j] != arr2[i][j]) {
-                return false;
-            }
+void rotate_sudoku(int **mat, int len) 
+{
+    register int i, j, temp;
+    for (i = 0; i < len / 2; i++) {
+
+        // Consider elements in group of 4 in
+        // current square
+        for (j = i; j < len - i - 1; j++) {
+
+            // store current cell in temp variable
+            temp = mat[i][j];
+
+            // move values from right to top
+            mat[i][j] = mat[j][len - 1 - i];
+
+            // move values from bottom to right
+            mat[j][len - 1 - i] = mat[len - 1 - i][len - 1 - j];
+
+            // move values from left to bottom
+            mat[len - 1 - i][len - 1 - j] = mat[len - 1 - j][i];
+
+            // assign temp to left
+            mat[len - 1 - j][i] = temp;
         }
     }
-    return true;
 }
 
-int main(int argc, char* argv[]) {
+void swap_rows(int **arr, int len, unsigned int row1, unsigned int row2) {
+    int *temp;
+    temp = arr[row1];
+    arr[row1] = arr[row2];
+    arr[row2] = temp;
+}
 
-    int **sudoku, **solution;
-    FILE *fpproblem, *fpsolution;
-	char ch;
-    unsigned int sudokusize = 9;
+void shuffle_sudoku(int **arr, int len) {
+    unsigned int shuffle, size;
+    int temp;
+    unsigned int row1, row2;
+    unsigned int min, max;
+    size = (int)sqrt(len);
+    shuffle = get_random_num(size * size, size *size *2);
+    printf("%d is shuffle\n", shuffle);
+    for(int i = 0; i < shuffle; i++) {
+        //swap or rotate
+        temp = get_random_num(0, 1);
+        printf("%d is swap or rotate\n", temp);
+        if(temp) {
+            // block no.
+            temp = get_random_num(0, size - 1);
+            printf("%d is block num\n", temp);
 
-    if(argc > 2) {
-        errno = EINVAL;
-        perror("usage");
-        return errno;
-    }
+            min = temp * size;
+            max = (temp + 1) * size - 1;
+            // printf("%d is block start\n", min);
+            // printf("%d is block end\n", max);
 
-    /*opening the file.
-     */
-    fpproblem = fopen(argv[1], "r");
-    // fpsolve = fopen(argv[2], "r");
-
-    /* checking if the file is opened
-     */
-    if(fpproblem == NULL) {
-        fprintf(stderr, "cannot open file %s\n", argv[1]);
-        return errno;
-    }
-
-    // if(fpsolve == NULL) {
-    //     fprintf(stderr, "cannot open file %s\n", argv[1]);
-    //     return errno;
-    // }
-
-    while(!feof(fpproblem)) {
-        ch = fgetc(fpproblem);
-        if(isdigit(ch)) {
-            break;
+            row1 = get_random_num(min, max);
+            row2 = get_random_num(min, max);
+            swap_rows(arr, len, row1, row2);
+        } else {
+            rotate_sudoku(arr, len);
         }
     }
-    sudokusize = ch - '0';
-    printf("%d is sudoku size\n", sudokusize);
+    rotate_sudoku(arr, len);
+    swap_rows(arr, len, 0, 1);
+}
 
-    /* first allocating memory to store address of integer pointer
-     * then allocating each integer pointer memory to store integer
-     */
-    sudoku = (int **)malloc(sudokusize * sizeof(int *));
-    for (int i = 0; i < sudokusize ; i++) {
-        sudoku[i] = (int *)malloc(sudokusize * sizeof(int));
+bool generate_seed(int **arr, int len) {
+    base_seed(arr, len);
+    shuffle_sudoku(arr, len);
+}
+
+void remove_k_elements(int **arr, int len, unsigned int k) {
+    
+    unsigned int row, col;
+
+    while(k) {
+        col = get_random_num(0, len - 1);
+        row = get_random_num(0, len - 1);
+        arr[row][col] = UNASSIGNED;
+        k--;
     }
+}
 
-    /* Initializes the 2d array.
-     */
-    for(int i = 0; i < sudokusize; i++) {
-        for(int j = 0; j < sudokusize; j++) {
-            sudoku[i][j] = UNASSIGNED;
+// bool sudoku_generator(int **problem_sudoku, int **seed_sudoku, int len) {
+
+//     srand(time(0));
+
+//     unsigned int k;
+
+//     generate_seed(seed_sudoku, len);
+
+//     /* copying all elements of seed_sudoku to problem_sudoku
+//      */
+//     copy_sudoku(seed_sudoku, problem_sudoku, len);
+
+//     k = (len * len / 2) + (len * len / 4);
+//     k = 5;
+//     // printf("removing %u elem\n", k);
+
+//     remove_k_elements(problem_sudoku, len, k);
+
+//     return true;
+// }
+
+int main() {
+    srand(time(0));
+    register int i, j;
+    int **sudoku;
+    int len = 4;
+    unsigned int k;
+    scanf("%d", &len);
+    sudoku = (int **)malloc(len * sizeof(int *));
+    if(sudoku == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return false;
+    }
+    for (i = 0; i < len ; i++) {
+        sudoku[i] = (int *)malloc(len * sizeof(int));
+        if(sudoku[i] == NULL) {
+            fprintf(stderr, "Memory allocation failed\n");
+            return false;
         }
     }
-    
-    /* getting input from a file in the sudoku
-     */
-	for(int i = 0; i < sudokusize; i++) {
-		for(int j = 0; j < sudokusize; j++) {
-			while(!feof(fpproblem)) {
-				ch = fgetc(fpproblem);
-				if(isdigit(ch)) {
-					break;
-				}
-			}
-            sudoku[i][j] = ch - '0';
-		}
-	}
-    
-    print_sudoku(sudoku, sudokusize);
 
-    if(!valid_sudoku(sudoku, sudokusize)) {
-		printf("not a valid sudoku\n");
-        exit(EXIT_FAILURE);
-	}
 
-    if(sudoku_solver(sudoku, sudokusize)) {
-
-        print_sudoku(sudoku, sudokusize);
-
-    } else {
-
-        fprintf(stderr, "Cannot solve input sudoku\n");
-        exit(EXIT_FAILURE);
-
+    generate_seed(sudoku, len);
+    k = (len * len) / 2 + (len * len) / 4;
+    remove_k_elements(sudoku, len , k);
+    print_sudoku(sudoku, len);
+    if(valid_sudoku(sudoku, len)) {
+        printf("valid\n");
     }
-
-    printf("Complete\n");
-
-    // solution = (int **)malloc(sudokusize * sizeof(int *));
-    // for (int i = 0; i < sudokusize ; i++) {
-    //     solution[i] = (int *)malloc(sudokusize * sizeof(int));
-    // }
-
-	// for(int i = 0; i < sudokusize; i++) {
-	// 	for(int j = 0; j < sudokusize; j++) {
-	// 		while(!feof(fpsolve)) {
-	// 			ch = fgetc(fpsolve);
-	// 			if(isdigit(ch)) {
-	// 				break;
-	// 			}
-	// 		}
-    //         solution[i][j] = ch - '0';
-	// 	}
-	// }
-
-    // if(comparesudoku(sudoku, solution, sudokusize)) {
-    //     printf("correctly solved\n");
-    // }
-    free(sudoku);
-    // free(solution);
-
-    fclose(fpproblem);
-
-
-
-    // if(generate_sudoku(sudoku, sudokusize)) {
-    //     printsudoku(sudoku, sudokusize);
-    // } else {
-    //     printf("false\n");
-    // }
-
     return 0;
 }

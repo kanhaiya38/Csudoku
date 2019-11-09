@@ -144,6 +144,7 @@ int print_generator_menu() {
 
 void print_game_commands() {
     puts("Commands:");
+    puts("");
     puts("    H - help");
     puts("    u - undo");
     puts("    r - redo");
@@ -153,4 +154,8 @@ void print_game_commands() {
     puts("    n - start new");
     puts("    i - insert");
     puts("    Q - quit");
+    puts("");
+    puts("");
+    // puts("");
+    // puts("");
 }
