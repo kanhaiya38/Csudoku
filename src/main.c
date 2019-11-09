@@ -14,6 +14,8 @@
 #include "../headers/menu.h"
 #include "../headers/print.h"
 #include "../headers/game.h"
+#include "../headers/baseseed.h"
+
 
 #define UNASSIGNED 0
 

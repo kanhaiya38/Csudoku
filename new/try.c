@@ -168,6 +168,11 @@
 //     return true;
 // }
 
+
+//////////////////////////////////////////////////////////////////////////
+
+
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -177,7 +182,6 @@
 #include "../headers/check.h"
 #include "../headers/sudokusolver.h"
 #include "../headers/print.h"
-#include "../headers/baseseed.h"
 
 #define UNASSIGNED 0
 
@@ -193,93 +197,86 @@ unsigned int get_random_num(unsigned int min, unsigned int max) {
      */
     unsigned int randomnum;
 
-    randomnum = rand() % (max - min + 1) + min;
+    randomnum = rand() % (max + min + 1) + min;
 
     return randomnum;
 }
 
-void copy_sudoku(int **source, int **copy, int len) {
+void copy_sudoku(int **seed_sudoku, int **problem_sudoku, int len) {
     register int i , j;
 
     for(i = 0; i < len; i++) {
         for(j = 0; j < len; j++) {
-            copy[i][j] = source[i][j];
+            problem_sudoku[i][j] = seed_sudoku[i][j];
         }
     }
 }
 
-
-
-void rotate_sudoku(int **mat, int len) 
-{
-    register int i, j, temp;
-    for (i = 0; i < len / 2; i++) {
-
-        // Consider elements in group of 4 in
-        // current square
-        for (j = i; j < len - i - 1; j++) {
-
-            // store current cell in temp variable
-            temp = mat[i][j];
-
-            // move values from right to top
-            mat[i][j] = mat[j][len - 1 - i];
-
-            // move values from bottom to right
-            mat[j][len - 1 - i] = mat[len - 1 - i][len - 1 - j];
-
-            // move values from left to bottom
-            mat[len - 1 - i][len - 1 - j] = mat[len - 1 - j][i];
-
-            // assign temp to left
-            mat[len - 1 - j][i] = temp;
-        }
-    }
+void abc() {
+    int sudoku25[25][25] = {
+	15, 9, 11, 4, 22, 6, 19, 18, 7, 3, 23, 10, 16, 5, 17, 8, 20, 2, 13, 24, 25, 1, 21, 14, 12,
+	12, 25, 1, 21, 14, 15, 9, 11, 4, 22, 6, 19, 18, 7, 3, 23, 10, 16, 5, 17, 8, 20, 2, 13, 24,
+	24, 8, 20, 2, 13, 12, 25, 1, 21, 14, 15, 9, 11, 4, 22, 6, 19, 18, 7, 3, 23, 10, 16, 5, 17,
+	17, 23, 10, 16, 5, 24, 8, 20, 2, 13, 12, 25, 1, 21, 14, 15, 9, 11, 4, 22, 6, 19, 18, 7, 3,
+	3, 6, 19, 18, 7, 17, 23, 10, 16, 5, 24, 8, 20, 2, 13, 12, 25, 1, 21, 14, 15, 9, 11, 4, 22,
+	22, 15, 9, 11, 4, 3, 6, 19, 18, 7, 17, 23, 10, 16, 5, 24, 8, 20, 2, 13, 12, 25, 1, 21, 14,
+	14, 12, 25, 1, 21, 22, 15, 9, 11, 4, 3, 6, 19, 18, 7, 17, 23, 10, 16, 5, 24, 8, 20, 2, 13,
+	13, 24, 8, 20, 2, 14, 12, 25, 1, 21, 22, 15, 9, 11, 4, 3, 6, 19, 18, 7, 17, 23, 10, 16, 5,
+	5, 17, 23, 10, 16, 13, 24, 8, 20, 2, 14, 12, 25, 1, 21, 22, 15, 9, 11, 4, 3, 6, 19, 18, 7,
+	7, 3, 6, 19, 18, 5, 17, 23, 10, 16, 13, 24, 8, 20, 2, 14, 12, 25, 1, 21, 22, 15, 9, 11, 4,
+	4, 22, 15, 9, 11, 7, 3, 6, 19, 18, 5, 17, 23, 10, 16, 13, 24, 8, 20, 2, 14, 12, 25, 1, 21,
+	21, 14, 12, 25, 1, 4, 22, 15, 9, 11, 7, 3, 6, 19, 18, 5, 17, 23, 10, 16, 13, 24, 8, 20, 2,
+	2, 13, 24, 8, 20, 21, 12, 12, 25, 1, 4, 22, 15, 9, 11, 7, 3, 6, 19, 18, 5, 17, 23, 10, 16,
+	16, 5, 17, 23, 10, 2, 13, 24, 8, 20, 21, 14, 12, 25, 1, 4, 22, 15, 9, 11, 7, 3, 6, 19, 18,
+	18, 7, 3, 6, 19, 16, 5, 17, 23, 10, 2, 13, 24, 8, 20, 21, 14, 12, 25, 1, 4, 22, 15, 9, 11,
+	11, 4, 22, 15, 9, 18, 7, 3, 6, 19, 16, 5, 17, 23, 10, 2, 13, 24, 8, 29, 21, 14, 12, 25, 1,
+	1, 21, 14, 12, 25, 11, 4, 22, 15, 9, 18, 7, 3, 6, 19, 16, 5, 17, 23, 10, 2, 13, 24, 8, 20,
+	20, 2, 13, 24, 8, 1, 21, 14, 12, 25, 11, 4, 22, 15, 9, 18, 7, 3, 6, 19, 16, 5, 17, 23, 10,
+	10, 16, 5, 17, 23, 20, 2, 13, 24, 8, 1, 21, 14, 12, 25, 11, 4, 22, 15, 9, 18, 7, 3, 6, 19,
+	19, 18, 7, 3, 6, 10, 16, 5, 17, 23, 20, 2, 13, 24, 8, 1, 21, 14, 12, 25, 11, 4, 22, 15, 9,
+	9, 11, 4, 22, 15, 19, 18, 7, 3, 6, 10, 16, 5, 17, 23, 20, 2, 13, 24, 8, 1, 21, 14, 12, 25,
+	25, 1, 21, 14, 12, 9, 11, 4, 22, 15, 19, 18, 7, 3, 6, 10, 16, 5, 17, 23, 20, 2, 13, 24, 8,
+	8, 20, 2, 13, 24, 25, 1, 21, 14, 12, 9, 11, 4, 22, 15, 19, 18, 7, 3, 6, 10, 16, 5, 17, 23,
+	23, 10, 16, 5, 17, 8, 20, 2, 13, 24, 25, 1, 21, 14, 12, 9, 11, 4, 22, 15, 19, 18, 7, 3, 6,
+	6, 19, 18, 7, 3, 23, 10, 16, 5, 17, 8, 20, 2, 13, 24, 25, 1, 21, 14, 12, 9, 11, 4, 22, 15 
+};
 }
 
-void swap_rows(int **arr, int len, unsigned int row1, unsigned int row2) {
-    int *temp;
-    temp = arr[row1];
-    arr[row1] = arr[row2];
-    arr[row2] = temp;
-}
-
-void shuffle_sudoku(int **arr, int len) {
-    unsigned int shuffle, size;
-    int temp;
-    unsigned int row1, row2;
-    unsigned int min, max;
-    size = (int)sqrt(len);
-    shuffle = get_random_num(size * size, size *size *2);
-    printf("%d is shuffle\n", shuffle);
-    for(int i = 0; i < shuffle; i++) {
-        //swap or rotate
-        temp = get_random_num(0, 1);
-        printf("%d is swap or rotate\n", temp);
-        if(temp) {
-            // block no.
-            temp = get_random_num(0, size - 1);
-            printf("%d is block num\n", temp);
-
-            min = temp * size;
-            max = (temp + 1) * size - 1;
-            // printf("%d is block start\n", min);
-            // printf("%d is block end\n", max);
-
-            row1 = get_random_num(min, max);
-            row2 = get_random_num(min, max);
-            swap_rows(arr, len, row1, row2);
-        } else {
-            rotate_sudoku(arr, len);
-        }
-    }
-    rotate_sudoku(arr, len);
-    swap_rows(arr, len, 0, 1);
-}
 
 bool generate_seed(int **arr, int len) {
-    base_seed(arr, len);
-    shuffle_sudoku(arr, len);
+
+    register int i, j;
+    /* Initializes the 2d array.
+     */
+    for(i = 0; i < len; i++) {
+        for(j = 0; j < len; j++) {
+            arr[i][j] = UNASSIGNED;
+        }
+    }
+    
+    if(len > 4){
+        fill_diagonal(arr, len);
+    } else {
+        fill_some_cells(arr, len);
+    }
+
+    // print_sudoku(arr, len);
+
+    // if(len < 25)
+
+    if(valid_sudoku(arr, len)) {
+        printf("sudoku is valid\n");
+        if(sudoku_solver(arr, len)) {
+            printf("sudoku solved\n");
+        } else {
+            printf("cannot solve sudoku\n");
+        }
+    } else {
+        printf("sudoku is not valid\n");
+    }
+    
+    return true;
+    
 }
 
 void remove_k_elements(int **arr, int len, unsigned int k) {
@@ -287,8 +284,8 @@ void remove_k_elements(int **arr, int len, unsigned int k) {
     unsigned int row, col;
 
     while(k) {
-        col = get_random_num(0, len - 1);
-        row = get_random_num(0, len - 1);
+        row = rand() % (len - 1) + 1;
+        col = rand() % (len - 1) + 1;
         arr[row][col] = UNASSIGNED;
         k--;
     }
@@ -307,41 +304,10 @@ bool sudoku_generator(int **problem_sudoku, int **seed_sudoku, int len) {
     copy_sudoku(seed_sudoku, problem_sudoku, len);
 
     k = (len * len / 2) + (len * len / 4);
-    // k = 5;
+    k = 5;
     // printf("removing %u elem\n", k);
 
     remove_k_elements(problem_sudoku, len, k);
 
     return true;
 }
-
-// int main() {
-//     srand(time(0));
-//     register int i, j;
-//     int **sudoku;
-//     int len = 4;
-//     unsigned int k;
-//     scanf("%d", &len);
-//     sudoku = (int **)malloc(len * sizeof(int *));
-//     if(sudoku == NULL) {
-//         fprintf(stderr, "Memory allocation failed\n");
-//         return false;
-//     }
-//     for (i = 0; i < len ; i++) {
-//         sudoku[i] = (int *)malloc(len * sizeof(int));
-//         if(sudoku[i] == NULL) {
-//             fprintf(stderr, "Memory allocation failed\n");
-//             return false;
-//         }
-//     }
-
-
-//     generate_seed(sudoku, len);
-//     k = (len * len) / 2 + (len * len) / 4;
-//     remove_k_elements(sudoku, len , k);
-//     print_sudoku(sudoku, len);
-//     if(valid_sudoku(sudoku, len)) {
-//         printf("valid\n");
-//     }
-//     return 0;
-// }
