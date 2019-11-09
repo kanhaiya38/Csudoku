@@ -141,3 +141,16 @@ int print_generator_menu() {
     printf("%d  me\n", choice);
     return choice;
 }
+
+void print_game_commands() {
+    puts("Commands:");
+    puts("    H - help");
+    puts("    u - undo");
+    puts("    r - redo");
+    puts("    h - hint");
+    puts("    c - clear");
+    puts("    s - solve");
+    puts("    n - start new");
+    puts("    i - insert");
+    puts("    Q - quit");
+}

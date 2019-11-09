@@ -56,16 +56,7 @@ static inline bool quit(char ch) {
 
 
 
-bool comparesudoku(int **arr1, int **arr2, int len) {
-    for(int i = 0; i < len; i++){
-        for(int j = 0; j < len; j++){
-            if(arr1[i][j] != arr2[i][j]) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
+
 
 /********************************************************/
 

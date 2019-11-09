@@ -42,8 +42,10 @@ bool issafe(int** arr, int len, int row, int col, int num) {
 
 bool find_empty_cell(int **arr, int len, int *row, int *col) {
 
-    for(int x = 0; x < len; x++) {
-        for(int y = 0; y < len; y++) {
+    register int x, y;
+
+    for(x = 0; x < len; x++) {
+        for(y = 0; y < len; y++) {
             if(check_empty_cell(arr, len, x, y)) {
              
                 *row = x;
@@ -63,7 +65,9 @@ bool find_empty_cell(int **arr, int len, int *row, int *col) {
 
 bool find_safe_num(int **arr, int len, int row, int col, int *i) {
 
-    for(int j = *i + 1; j <= len; j++) {
+    register int j;
+
+    for(j = *i + 1; j <= len; j++) {
 
         if(issafe(arr, len, row, col, j)) {
             *i = j;
@@ -92,9 +96,12 @@ bool valid_sudoku_size(unsigned int len) {
  * else it returns false.
  */
 bool valid_sudoku(int **arr, int len) {
+    
+    register int i, j;
+
     int temp;
-	for(int i = 0; i < len; i++){
-        for(int j = 0; j < len; j++){
+	for(i = 0; i < len; i++){
+        for(j = 0; j < len; j++){
             temp = arr[i][j];
             arr[i][j] = 0;
 			if(temp == 0) {
