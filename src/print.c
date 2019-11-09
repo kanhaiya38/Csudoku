@@ -2,6 +2,8 @@
 #include <math.h>
 #include "../headers/print.h"
 
+#define UNASSIGNED 0
+
 static inline void green() {
     printf("\033[0;36m");
 }
@@ -24,9 +26,21 @@ void print_sudoku(int **arr, int len) {
 
     for(i = 0; i <= 2 * len; i++){
 
+        if(i == 0) {
+            printf(" ");
+            for(int p = 0; p < len; p++) {
+                printf("   %c", 'a' + p);
+                if(len > 9)
+                    printf(" ");
+            }
+            printf("\n");
+        }
+
         for(j = 0; j < len; j++) {
 
             if(i % (2 * size) == 0) {
+                if(j == 0)
+                    printf("  ");
                 blue();
                 printf("+---");
                 if(size > 3) {
@@ -34,6 +48,9 @@ void print_sudoku(int **arr, int len) {
                 }
                 reset();
             } else if(i % 2 == 0) {
+                if(j == 0) {
+                    printf("  ");
+                }
                 if(j % size == 0) {
                     blue();
                     printf("+");
@@ -53,14 +70,24 @@ void print_sudoku(int **arr, int len) {
                     reset();
                 }
             } else {
+                if(j == 0)
+                    printf("%c ", 'a' + (i - 1) / 2);
                 if(j % size == 0) {
                     blue();
                     printf("|");
                     reset();
                     if(size > 3) {
-                        printf(" %2d ", arr[(i - 1) / 2][j]);
+                        // if(arr[(i - 1) / 2][j] == UNASSIGNED) {
+                        //     printf(" xx ");
+                        // } else {
+                            printf(" %2d ", arr[(i - 1) / 2][j]);
+                        // }
                     } else {
-                        printf(" %d ", arr[(i - 1) / 2][j]);
+                        // if(arr[(i - 1) / 2][j] == UNASSIGNED) {
+                        //     printf(" x ");
+                        // } else {
+                            printf(" %d ", arr[(i - 1) / 2][j]);
+                        // }
                     }
                 } else {
                     green();
