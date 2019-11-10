@@ -2,70 +2,119 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 #define N 32
 
-void fastscan(int *number) 
-{ 
-    register int c; 
+static inline void clr_scr() {
+    printf("\e[1;1H\e[2J");
+}
+
+// void fastscan(int *number) 
+// { 
+//     register int c; 
   
-    *number = 0; 
+//     *number = 0; 
   
-    // extract current character from buffer 
-    c = getchar(); 
-    // if (c=='-') 
-    // { 
-    //     // number is negative 
-    //     negative = true; 
+//     // extract current character from buffer 
+//     c = getchar();
+//     if(!(c > 47 && c < 58)) {
+//         *number = 100;
+//     }
+//     // if (c=='-') 
+//     // { 
+//     //     // number is negative 
+//     //     negative = true; 
   
-    //     // extract the next character from the buffer 
-    //     c = getchar(); 
-    // } 
+//     //     // extract the next character from the buffer 
+//     //     c = getchar(); 
+//     // } 
   
-    // Keep on extracting characters if they are integers 
-    // i.e ASCII Value lies from '0'(48) to '9' (57) 
-    for (; (c>47 && c<58); c=getchar()) 
-        *number = *number * 10 + c - 48; 
-  
-    // if scanned input has a negative sign, negate the 
-    // value of the input number 
-        // number *= -1; 
+//     // Keep on extracting characters if they are integers 
+//     // i.e ASCII Value lies from '0'(48) to '9' (57) 
+//     // for (; (c>47 && c<58); c=getchar()) 
+//     while(c > 47 && c < 58) {
+//         *number = *number * 10 + c - 48; 
+//         c = getchar();
+//     }
+//     // if scanned input has a negative sign, negate the 
+//     // value of the input number 
+//         // number *= -1; 
+// }
+
+void scan_opt(int *num) {
+    char str[10];
+    scanf("%s", str);
+    int sum = 0;
+    register int i;
+    for(i = 0; i < strlen(str); i++) {
+        if(isspace(str[i])) {
+            continue;
+        }
+        if(isalpha(str[i])) {
+            *num = 100;
+            return;
+        }
+        if(isdigit(str[i])) {
+            while(isdigit(str[i])) {
+                sum = sum * 10 + (str[i] - '0');
+                // i++;
+                if(i == strlen(str) - 1) {
+                    break;
+                }
+                i++;
+            }
+            *num = sum;
+            return;
+        }
+
+    }
 }
 
 int print_menu() {
     int choice;
-    // puts("What do you want to do?");
+    clr_scr();
     puts("1. Solve a Sudoku");
     puts("2. Generate a Sudoku");
     puts("0. Quit");
-    // scanf("%[^\n]%*c", choice);
-    // getchar();
-    fastscan(&choice);
-    printf("%d  me\n", choice);
+    scan_opt(&choice);
+    while(choice > 2) {
+        clr_scr();
+        puts("Select one of the options: ");
+        puts("1. Solve a Sudoku");
+        puts("2. Generate a Sudoku");
+        puts("0. Quit");
+        scan_opt(&choice);
+    }
     return choice;
 }
 
 int print_solver_menu() {
     int choice;
-    // puts("How do you want to enter the Sudoku");
+    clr_scr();
     puts("1. Get sudoku from a file");
     puts("2. Enter a sudoku");
     puts("0. To go back");
-    // scanf("%[^\n]%*c", choice);
-    fastscan(&choice);
+    scan_opt(&choice);
+    while(choice > 2) {
+        clr_scr();
+        puts("Select one of the options: ");
+        puts("1. Get sudoku from a file");
+        puts("2. Enter a sudoku");
+        puts("0. To go back");
+        scan_opt(&choice);
+    }
     return choice;
 }
 
 int get_sudoku_size() {
     int size;
     puts("Enter the size of the sudoku");
-    // getchar();
-    fastscan(&size);
-    printf("size is %d", size);
+    scan_opt(&size);
     while(size != 4 && size != 9 && size != 16 && size != 25 && size != 0) {
         puts("Please enter a valid size or enter 0 to go back one stage");
-        fastscan(&size);
-    // printf("size is %u", size);
+        // fastscan(&size);
+        scan_opt(&size);
     }
     return size;
 }
@@ -74,9 +123,11 @@ bool get_sudoku_from_file(int **arr, int len) {
     char file_name[128];
     FILE *fp_problem;
 	char ch;
-
+    int sum = 0;
+    register int i, j;
     puts("Enter file name");
     scanf("%s", file_name);
+
     /*opening the file.
      */
     fp_problem = fopen(file_name, "r");
@@ -85,28 +136,43 @@ bool get_sudoku_from_file(int **arr, int len) {
      */
     while(fp_problem == NULL) {
         fprintf(stderr, "cannot open file %s\n", file_name);
-        puts("Please enter a valid file or 0 to go back");
+        puts("Please enter a valid file or quit to go back");
         scanf("%s", file_name);
-        if(!strcmp(file_name, "0")) {
+        if(!strcmp(file_name, "quit")) {
             return false;
         }
         fp_problem = fopen(file_name, "r");
     }
-
     /* getting input from a file in the sudoku
      */
-    for(int i = 0; i < len; i++) {
-        for(int j = 0; j < len; j++) {
+    for(i = 0; i < len; i++) {
+        for(j = 0; j < len; j++) {
+            sum = 0;
             while(!feof(fp_problem)) {
                 ch = fgetc(fp_problem);
+                if(isspace(ch)) {
+                    continue;
+                }
+                if(isalpha(ch)) {
+                    fprintf(stderr, "%s is not a valid sudoku\n", file_name);
+                    return false;
+                }
                 if(isdigit(ch)) {
+                    while(isdigit(ch)) {
+                        sum = sum * 10 + (ch - '0');
+                        if(!feof(fp_problem)) {
+                            ch = fgetc(fp_problem);
+                        } else {
+                            break;
+                        }
+                    }
+
                     break;
                 }
             }
-            arr[i][j] = ch - '0';
+            arr[i][j] = sum;
         }
     }
-
     fclose(fp_problem);
 
     return true;
@@ -115,12 +181,10 @@ bool get_sudoku_from_file(int **arr, int len) {
 bool get_input_sudoku(int **arr, int len) {
 
     register int i, j;
-    // int num;
-            // getchar();
     for(i = 0; i < len; i++) {
         for(j = 0; j < len; j++) {
-            fastscan(&arr[i][j]);
-            // printf("%d skj", arr[i][j]);
+            // fastscan(&arr[i][j]);
+            scan_opt(&arr[i][j]);
         }
     }
     
@@ -135,27 +199,29 @@ int print_generator_menu() {
     puts("3. Hard");
     puts("4. Expert");
     puts("0. Quit");
-    // scanf("%[^\n]%*c", choice);
-    // getchar();
-    fastscan(&choice);
-    printf("%d  me\n", choice);
+    scan_opt(&choice);
+    while(choice > 4) {
+        puts("Select one of the options: ");
+        puts("1. Easy");
+        puts("2. Medium");
+        puts("3. Hard");
+        puts("4. Expert");
+        puts("0. Quit");
+        scan_opt(&choice);
+    }
     return choice;
 }
 
 void print_game_commands() {
     puts("Commands:");
     puts("");
-    puts("    H - help");
-    puts("    u - undo");
-    puts("    r - redo");
-    puts("    h - hint");
-    puts("    c - clear");
-    puts("    s - solve");
-    puts("    n - start new");
-    puts("    i - insert");
-    puts("    Q - quit");
+    puts("  save");
+    puts("  undo");
+    puts("  redo");
+    puts("  hint");
+    puts("  clear");
+    puts("  solve");
+    puts("  new");
+    puts("  quit");
     puts("");
-    puts("");
-    // puts("");
-    // puts("");
 }

@@ -10,7 +10,6 @@
 #include "../headers/sudokusolver.h"
 #include "../headers/sudokugenerator.h"
 #include "../headers/check.h"
-#include "../headers/file.h"
 #include "../headers/menu.h"
 #include "../headers/print.h"
 #include "../headers/game.h"
@@ -18,76 +17,28 @@
 
 
 #define UNASSIGNED 0
-
-static inline bool quit(char ch) {
-    return ch == 'Q';
-}
-
-// bool init_sudoku(int **arr, int len) {
-
-//     /* first allocating memory to store address of integer pointer
-//      * then allocating each integer pointer memory to store integer
-//      */
-//     arr = (int **)malloc(len * sizeof(int *));
-
-//     if(arr == NULL) {
-    
-//         fprintf(stderr, "Memory allocation failed\n");
-    
-//         return false;
-//     }
-
-//     for (int i = 0; i < len ; i++) {
-    
-//         arr[i] = (int *)malloc(len * sizeof(int));
-
-//         if(arr[i] == NULL) {
-    
-//             fprintf(stderr, "Memory allocation failed\n");
-    
-//             return false;
-    
-//         }
-    
-//     }
-
-//     return true;
-
-// }
-
-
-
-
-
-
-/********************************************************/
+#define MAX 25
 
 int main() {
 
     int **sudoku = NULL;
-    char file_name[128];
-    unsigned int sudokusize = 9;
+    unsigned int sudokusize;
     register int i;
-    FILE *fp_problem;
-    char ch;
-    int ch_menu, ch_solver_menu;
+    int ch_menu;
     bool quit = false;
-
-    // if(!init_sudoku(sudoku, sudokusize)) {
-    //     fprintf(stderr, "Not enough memory\n");
-    //     return EXIT_FAILURE;
-    // }
+    int temp;
+    char choice;
     
     /* first allocating memory to store address of integer pointer
      * then allocating each integer pointer memory to store integer
      */
-    sudoku = (int **)malloc(sudokusize * sizeof(int *));
+    sudoku = (int **)malloc(MAX * sizeof(int *));
     if(sudoku == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
         return false;
     }
-    for (i = 0; i < sudokusize ; i++) {
-        sudoku[i] = (int *)malloc(sudokusize * sizeof(int));
+    for (i = 0; i < MAX ; i++) {
+        sudoku[i] = (int *)malloc(MAX * sizeof(int));
         if(sudoku[i] == NULL) {
             fprintf(stderr, "Memory allocation failed\n");
             return false;
@@ -106,63 +57,72 @@ int main() {
                         case 1:
                             sudokusize = get_sudoku_size();
                             if(sudokusize == 0) {
-                                quit = true;
+                                // quit = true;
                                 break;
                             }
 
                             if(!get_sudoku_from_file(sudoku, sudokusize)) {
-                                quit = true;
+                                // quit = true;
                                 break;
                             }
 
                             if(!valid_sudoku(sudoku, sudokusize)) {
                                 fprintf(stderr, "It is not a valid sudoku\n");
-                                quit = true;
+                                // quit = true;
                                 break;
                             }
 
                             if(!sudoku_solver(sudoku, sudokusize)) {
                                 fprintf(stderr, "No solutions found\n");
-                                quit = true;
+                                // quit = true;
                                 break;
                             }
 
                             print_sudoku(sudoku, sudokusize);
-                            
-                            break;
 
+                            puts("Enter enter to continue");
+
+                            if(getchar() && getchar());
+
+                            break;
                         /* enter sudoku */
-                        case '2':
+                        case 2:
                             sudokusize = get_sudoku_size();
                             if(sudokusize == 0) {
-                                quit = true;
                                 break;
                             }
+
+                            puts("Enter sudoku[Warning: seperate numbers by spaces]");
 
                             if(!get_input_sudoku(sudoku, sudokusize)) {
-                                quit = true;
                                 break;
                             }
-
+                            
+                            puts("Input Sudoku:");
                             print_sudoku(sudoku, sudokusize);
 
                             if(!valid_sudoku(sudoku, sudokusize)) {
                                 fprintf(stderr, "It is not a valid sudoku\n");
-                                quit = true;
                                 break;
                             }
 
                             if(!sudoku_solver(sudoku, sudokusize)) {
                                 fprintf(stderr, "No solutions found\n");
-                                quit = true;
                                 break;
                             }
 
+                            puts("Solution");
+
                             print_sudoku(sudoku, sudokusize);
-                            
+
+                            puts("Enter enter to continue");
+
+                            if(getchar() && getchar());
+
                             break;
+
                         /* to go back */
-                        case '0':
+                        case 0:
                             quit = true;
                             break;
                         /* NOTA */
@@ -170,14 +130,14 @@ int main() {
                             puts("Please choose one of the above");
                             break;
                     }
-                    quit = false;
                 }
+                quit = false;
                 break;
             /* Generate a sudoku */
             case 2:
                 while(!quit) {
-                    ch_menu = print_generator_menu();
-                    switch(ch_menu) {
+                    temp = print_generator_menu();
+                    switch(temp) {
                         /* easy */
                         case 1:
                             sudokusize = 4;
@@ -202,17 +162,22 @@ int main() {
                             puts("Please choose one of the above or 0 to go back");
                             break;
                     }
+                    quit = false;
+                    if(sudokusize == 0) {
+                        quit = true;
+                        break;
+                    }
+                    if(!sudoku_game(sudokusize)) {
+                        quit = true;
+                        break;
+                    } else {
+                        print_sudoku(sudoku, sudokusize);
+                    }
                 }
                 quit = false;
-                if(!sudoku_game(sudokusize)) {
-                    quit = true;
-                    break;
-                } else {
-                    print_sudoku(sudoku, sudokusize);
-                }
                 break;
             /* Quit */
-            case '3':
+            case 0:
                 quit = true;
                 break;
             /* NOTA */
@@ -220,6 +185,9 @@ int main() {
                 break;
         }
     }
-
+    for (i = 0; i < MAX ; i++) {
+        free(sudoku[i]);
+    }
+    free(sudoku);
     return EXIT_SUCCESS;
 }
