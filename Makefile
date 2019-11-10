@@ -19,7 +19,7 @@ CCFLAGS=$(DEBUG) $(OPT) $(WARN)
 LD = -lm
 
 OBJS = main.o sudokusolver.o sudokugenerator.o \
-check.o stack.o file.o menu.o print.o game.o baseseed.o
+check.o stack.o menu.o print.o game.o baseseed.o
 
 all : $(OBJS)
 	$(CC) -o $(TARGET) $(CCFLAGS) $(OBJS) $(LD)
@@ -32,10 +32,6 @@ main.o : src/main.c headers/print.h
 	
 menu.o : src/menu.c headers/menu.h
 	$(CC) -c $(CCFLAGS) src/menu.c
-
-file.o : src/file.c headers/file.h
-	$(CC) -c $(CCFLAGS) src/file.c
-
 
 game.o : src/game.c headers/game.h
 	$(CC) -c $(CCFLAGS) src/game.c

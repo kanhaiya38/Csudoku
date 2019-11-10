@@ -108,7 +108,7 @@ bool valid_sudoku(int **arr, int len) {
 				continue;
 			}
             if(!issafe(arr, len, i, j, temp)) {
-                printf("%d, %d is wrong\n", i, j);
+                // printf("%d, %d is wrong\n", i, j);
 				return false;
 			}
             arr[i][j] = temp;
