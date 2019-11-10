@@ -17,6 +17,7 @@ static inline void clr_scr() {
     printf("\e[1;1H\e[2J");
 }
 
+/* returns tokenised data only if is valid otherwise returns false */
 bool get_data(char *cmd, int strlen, values *token) {
 
     register int i;
@@ -70,8 +71,8 @@ bool get_data(char *cmd, int strlen, values *token) {
     return true;
 }
 
+/* to assign value to command */
 unsigned int get_command_num(char *cmd) {
-    
 
     if(!strcmp(cmd, "save"))
         return 1;
@@ -87,13 +88,12 @@ unsigned int get_command_num(char *cmd) {
         return 6;
     if(!strcmp(cmd, "new"))
         return 7;
-    // if(!strcmp(cmd, "save"))
-    //     return 7;
     if(!strcmp(cmd, "quit"))
         return 0;
     return 9;
 }
 
+/* saves sudoku to file */
 bool save_sudoku_to_file(int **seed, int **problem, int len, char *str) {
     register int i, j;
     FILE *fp_save;
@@ -126,7 +126,6 @@ bool save_sudoku_to_file(int **seed, int **problem, int len, char *str) {
         for(j = 0; j < len; j++) {
             fputc((problem[i][j] + '0'), fp_save);
             fputc(' ', fp_save);
-            // fputc(' ', fp_save);
         }
     }
 
@@ -134,10 +133,7 @@ bool save_sudoku_to_file(int **seed, int **problem, int len, char *str) {
     return true;
 }
 
-// void get_token(char *str) {
-//     static int i = 0
-// }
-
+/* gets saved sudoku */
 bool get_saved_sudoku(int **seed, int **problem, int* len, char *str) {
     register int i, j;
     FILE *fp_saved;
@@ -161,17 +157,14 @@ bool get_saved_sudoku(int **seed, int **problem, int* len, char *str) {
         for(j = 0; j < *len; j++) {
             seed[i][j] = fgetc(fp_saved) - '0';
             fgetc(fp_saved);
-            // fputc(' ', fp_save);
         }
     }
     fgetc(fp_saved);
-    // fputc('\n', fp_save);
 
     for(i = 0; i < *len; i++) {
         for(j = 0; j < *len; j++) {
             problem[i][j]= fgetc(fp_saved) -'0';
             fgetc(fp_saved);
-            // fputc(' ', fp_save);
         }
     }
     fgetc(fp_saved);
@@ -325,7 +318,6 @@ bool sudoku_game(int len) {
                     sudoku[data.row][data.col] = UNASSIGNED;
                     clr_scr();
                     print_game_commands();
-                    // print_sudoku(sudoku, len);
                     print_sudoku_game(seed_sudoku, sudoku, len);
                 } else {
                     fprintf(stderr, "Cannot undo\n");
@@ -342,7 +334,6 @@ bool sudoku_game(int len) {
                     sudoku[data.row][data.col] = data.num;
                     clr_scr();
                     print_game_commands();
-                    // print_sudoku(sudoku, len);
                     print_sudoku_game(seed_sudoku, sudoku, len);
                 } else {
                     fprintf(stderr, "Cannot redo\n");
@@ -356,14 +347,12 @@ bool sudoku_game(int len) {
                 sudoku = problem_sudoku;
                 clr_scr();
                 print_game_commands();
-                // print_sudoku(sudoku, len);
                 print_sudoku_game(seed_sudoku, sudoku, len);
                 break;
             case 6:
                 sudoku = seed_sudoku;
                 clr_scr();
                 print_game_commands();
-                // print_sudoku(sudoku, len);
                 print_sudoku_game(seed_sudoku, sudoku, len);
                 puts("Sudoku solved");
                 break;
@@ -372,7 +361,6 @@ bool sudoku_game(int len) {
                 copy_sudoku(problem_sudoku, sudoku, len);
                 clr_scr(); 
                 print_game_commands();
-                // print_sudoku(sudoku, len);
                 print_sudoku_game(seed_sudoku, sudoku, len);
                 break;
             case 8:
@@ -388,7 +376,6 @@ bool sudoku_game(int len) {
                     }
                 } else {
                     print_game_commands();
-                    // print_sudoku(sudoku, len);
                     print_sudoku_game(seed_sudoku, sudoku, len);
                     puts("Not a command");
                     continue;
