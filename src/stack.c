@@ -1,62 +1,48 @@
 #include <stdio.h>
-
 #include <stdlib.h>
 
 #include "../headers/stack.h"
 
-
 void init(stack *s) {
+	*s = NULL;
 
-    *s = NULL;
-
-    // printf("stack initialised\n");
-
+	// printf("stack initialised\n");
 }
 
 void push(stack *s, values pushval) {
+	node *temp = (node *)malloc(sizeof(node));
 
-    node *temp = (node *)malloc(sizeof(node));
+	temp->val.num = pushval.num;
 
-    temp->val.num = pushval.num;
+	temp->val.row = pushval.row;
 
-    temp->val.row = pushval.row;
+	temp->val.col = pushval.col;
 
-    temp->val.col = pushval.col;
+	temp->next = *s;
 
-    temp->next = *s;
+	*s = temp;
 
-    *s = temp;
-
-    // printf("(%d, %d, %d) is pushed into stack\n", (*s)->val.row, (*s)->val.col, (*s)->val.num);
-
+	// printf("(%d, %d, %d) is pushed into stack\n",
+	// (*s)->val.row, (*s)->val.col, (*s)->val.num);
 }
 
 values pop(stack *s) {
+	node *temp = *s;
 
-    node *temp = *s;
+	values popval;
 
-    values popval;
+	popval = (*s)->val;
 
-    popval = (*s)->val;
+	*s = (*s)->next;
 
-    *s = (*s)->next;
+	free(temp);
 
-    free(temp);
+	// printf("(%d, %d, %d) is poped from stack\n",
+	// popval.row, popval.col, popval.num);
 
-    // printf("(%d, %d, %d) is poped from stack\n", popval.row, popval.col, popval.num);
-
-    return popval;
-
+	return popval;
 }
 
-int isempty(stack *s) {
+int isempty(stack *s) { return (*s) == NULL; }
 
-    return (*s) == NULL;
-
-}
-
-int isfull(stack *s) {
-
-    return 0;
-
-}
+int isfull(stack *s) { return 0; }
